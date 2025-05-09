@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Esthetic Medicine LLM Evaluation</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 1200px; margin: 0 auto; padding: 20px; }
+        table { border-collapse: collapse; width: 100%; margin: 20px 0; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
+        th { background-color: #f2f2f2; }
+        tr:nth-child(even) { background-color: #f9f9f9; }
+        .header { margin-bottom: 30px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Esthetic Medicine LLM Evaluation</h1>
+        <p>This repository contains evaluation results for various LLMs on esthetic medicine knowledge. 
+           The assessment was conducted by Dr. Yohann Missiak MD, covering multiple domains in the field.</p>
+    </div>
+
+    <h2>Evaluation Results</h2>
+    <div id="table-container"></div>
+
+    <h2>Visual Performance Comparison</h2>
+    <img src="./Esthetic Medicine [Private Eval - Small LLM] by Doctor Yohann Missiak MD.png" 
+         alt="Esthetic Medicine LLM Evaluation Results" style="max-width: 100%;">
+
+    <script>
+        // Function to load and display CSV data
+        function loadCSV() {
+            Papa.parse("Esthetic Medicine [Private Eval - Small LLM].csv", {
+                download: true,
+                header: true,
+                complete: function(results) {
+                    displayTable(results.data);
+                }
+            });
+        }
+
+        // Function to display the data as a table
+        function displayTable(data) {
+            const container = document.getElementById('table-container');
+            if (data.length === 0) return;
+            
+            // Create table
+            const table = document.createElement('table');
+            
+            // Create header row
+            const thead = document.createElement('thead');
+            const headerRow = document.createElement('tr');
+            
+            // Get column headers from the first data row
+            const headers = Object.keys(data[0]);
+            headers.forEach(header => {
+                const th = document.createElement('th');
+                th.textContent = header;
+                headerRow.appendChild(th);
+            });
+            
+            thead.appendChild(headerRow);
+            table.appendChild(thead);
+            
+            // Create table body with data rows
+            const tbody = document.createElement('tbody');
+            data.forEach(row => {
+                const tr = document.createElement('tr');
+                headers.forEach(header => {
+                    const td = document.createElement('td');
+                    td.textContent = row[header];
+                    tr.appendChild(td);
+                });
+                tbody.appendChild(tr);
+            });
+            
+            table.appendChild(tbody);
+            container.appendChild(table);
+        }
+
+        // Load CSV when page loads
+        window.onload = loadCSV;
+    </script>
+</body>
+</html>
