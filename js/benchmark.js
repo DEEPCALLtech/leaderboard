@@ -232,6 +232,19 @@ function setupUI(df, modelColumns, modelMapping) {
     let difficulties = [...new Set(df.map(row => row["Difficulty"]))].sort();
     difficulties = difficulties.filter(d => ["Easy", "Mid"].includes(d));
     
+    // Variables to track default selections
+    let defaultSpecialty = "All Specialties";
+    let defaultDifficulty = "Easy";
+    
+    // Check if our desired defaults exist in the data
+    if (!specialties.includes(defaultSpecialty)) {
+        defaultSpecialty = specialties[0]; // Fall back to first specialty
+    }
+    
+    if (!difficulties.includes(defaultDifficulty)) {
+        defaultDifficulty = difficulties[0]; // Fall back to first difficulty
+    }
+    
     // Populate specialty dropdown
     const specialtySelect = document.getElementById('specialty-select');
     specialtySelect.innerHTML = '';
@@ -243,6 +256,12 @@ function setupUI(df, modelColumns, modelMapping) {
             const option = document.createElement('option');
             option.value = specialty;
             option.textContent = specialty;
+            
+            // Select "All Specialties" by default
+            if (specialty === defaultSpecialty) {
+                option.selected = true;
+            }
+            
             specialtySelect.appendChild(option);
         }, delay);
         delay += 50; // Stagger the additions
@@ -251,10 +270,17 @@ function setupUI(df, modelColumns, modelMapping) {
     // Populate difficulty dropdown
     const difficultySelect = document.getElementById('difficulty-select');
     difficultySelect.innerHTML = '';
+    
     difficulties.forEach(difficulty => {
         const option = document.createElement('option');
         option.value = difficulty;
         option.textContent = difficulty;
+        
+        // Select "Easy" by default
+        if (difficulty === defaultDifficulty) {
+            option.selected = true;
+        }
+        
         difficultySelect.appendChild(option);
     });
     
@@ -280,13 +306,24 @@ function setupUI(df, modelColumns, modelMapping) {
         timeoutId = setTimeout(() => updateTable(df, modelColumns, modelMapping), 200);
     });
     
-    // Initial table update
-    updateTable(df, modelColumns, modelMapping);
+    // Wait for dropdowns to be fully populated before updating the table
+    // This ensures our default values are set
+    setTimeout(() => {
+        // Force the default values in case the DOM hasn't updated yet
+        specialtySelect.value = defaultSpecialty;
+        difficultySelect.value = defaultDifficulty;
+        
+        // Initial table update with our default values
+        updateTable(df, modelColumns, modelMapping, defaultSpecialty, defaultDifficulty);
+    }, specialties.length * 50 + 100); // Wait for all options to be added
 }
 
-function updateTable(df, modelColumns, modelMapping) {
-    const specialty = document.getElementById('specialty-select').value;
-    const difficulty = document.getElementById('difficulty-select').value;
+function updateTable(df, modelColumns, modelMapping, forceSpecialty, forceDifficulty) {
+    // Get selected values from dropdowns, or use forced values if provided
+    const specialty = forceSpecialty || document.getElementById('specialty-select').value;
+    const difficulty = forceDifficulty || document.getElementById('difficulty-select').value;
+    
+    console.log(`Updating table for Specialty: ${specialty}, Difficulty: ${difficulty}`);
     
     // Create model comparison table
     const result = createModelComparisonTable(df, specialty, difficulty, modelColumns, modelMapping);
@@ -308,6 +345,9 @@ function createModelComparisonTable(df, specialty, difficulty, modelColumns, mod
     if (difficulty !== "All") {
         filteredData = filteredData.filter(row => row["Difficulty"] === difficulty);
     }
+    
+    // Log the filtered data for debugging
+    console.log(`Found ${filteredData.length} rows matching criteria`);
     
     // Create a new array for the table display
     const tableData = [];
@@ -343,18 +383,21 @@ function createModelComparisonTable(df, specialty, difficulty, modelColumns, mod
     });
     
     // Move Rank to the beginning
-    tableData.forEach(row => {
+    const rankedData = tableData.map(row => {
         const { Rank, ...rest } = row;
-        Object.assign(row, { Rank, ...rest });
+        return { Rank, ...rest };
     });
     
-    return tableData;
+    return rankedData;
 }
 
 function getColoredTable(data) {
     // Check if data is empty
-    if (data.length === 0) {
-        return "<div class='no-results'>No models with non-zero scores in this category.</div>";
+    if (!data || data.length === 0) {
+        return `<div class='no-results'>
+            <p>No models with non-zero scores in this category.</p>
+            <p>Please try selecting "All Specialties" and "Easy" from the dropdowns.</p>
+        </div>`;
     }
     
     let html = "<table class='results-table'>";
@@ -404,4 +447,3 @@ function getColoredTable(data) {
     html += "</table>";
     return html;
 }
-
