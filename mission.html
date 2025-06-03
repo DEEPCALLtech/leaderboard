@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DEEPCALL | Mission</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@300;400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="grid-background"></div>
+    
+    <header>
+        <div class="logo-container">
+            <div class="logo">
+                <div class="logo-icon">
+                    <div class="node"></div>
+                    <div class="node"></div>
+                    <div class="node"></div>
+                    <div class="curve"></div>
+                </div>
+                <div class="logo-text">DEEPCALL</div>
+            </div>
+        </div>
+        
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="benchmark.html">Benchmark</a></li>
+                <li><a href="mission.html" class="active">Mission</a></li>
+                <li><a href="contact.html">Contact</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section class="mission-hero">
+            <div class="glass-panel wide">
+                <h1>Our <span class="highlight">Mission</span></h1>
+                <p class="subtitle">Advancing AI for healthcare through rigorous evaluation and research</p>
+            </div>
+        </section>
+
+        <section class="mission-content">
+            <div class="glass-panel">
+                <div class="mission-grid">
+                    <div class="mission-text">
+                        <h2>Research <span class="highlight">Goals</span></h2>
+                        <p>The goal of our research is to provide private evaluations that explore various knowledge domains and reasoning methods of small LLMs in the medical context.</p>
+                        
+                        <p>We aim to understand how these models perform on clinical cases with varying levels of difficulty, starting with foundational knowledge and expanding to more complex scenarios.</p>
+                        
+                        <p>This work is part of a broader research effort to analyze reasoning patterns, knowledge representation, and domain-specific capabilities of language models, with potential applications in medical education and research tools development.</p>
+                        
+                        <h3>Research Focus Areas:</h3>
+                        <ul class="glow-list">
+                            <li>Knowledge representation in medical domains</li>
+                            <li>Reasoning patterns across different model architectures</li>
+                            <li>Performance on standardized clinical cases</li>
+                            <li>Domain adaptation capabilities</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="mission-image">
+                        <img src="assets/deepcall3.png" alt="DEEPCALL AI Visualization" class="glow-image">
+                    </div>
+                </div>
+                
+                <div class="mission-section">
+                    <h2>Our <span class="highlight">Approach</span></h2>
+                    <p>We evaluate small portable LLMs (under 13B parameters) on relevant medicine daily practice concepts. Due to GDPR and HIPAA legislation, LOCAL small LLMs seem to be the appropriate answer to respect patients' privacy and patient-physician data use consent.</p>
+                    
+                    <p>Our evaluation uses a PRIVATE dataset of Questions/Answers in order to prevent data leakage and overfitting. We put models "under stress" by testing them with clinical cases of potentially life-threatening situations. Models are asked to take an action and provide a real definitive answer.</p>
+                    
+                    <p>Our dataset of Question/Answer pairs intends to be the most relevant in terms of clinical benchmarking. All answers are graded manually by Doctor Yohann Missiak MD, specialist of Chemical Pathology, clinical laboratory Director and Professor of Master CEMP AI Healthcare, Chichester.</p>
+                </div>
+                
+                <div class="mission-section">
+                    <h2>Important <span class="highlight">Limitations</span></h2>
+                    <ul class="limitation-list">
+                        <li>This is an experimental research project, not a clinical validation</li>
+                        <li>Performance on this test does not indicate clinical competence or relevancy</li>
+                        <li>No LLM should be used for actual medical advice, diagnostics or decision-making</li>
+                        <li>This evaluation was not peer-reviewed or validated for clinical use</li>
+                        <li>Results are shared for research purposes only</li>
+                    </ul>
+                    
+                    <div class="disclaimer-box">
+                        <h3>Medical Disclaimer</h3>
+                        <p>This test evaluation is for experimental research purposes only. The author Dr. Yohann Missiak makes no claims about the medical reliability of any of these models and expressly disclaims any liability for their use in any medical context.</p>
+                    </div>
+                </div>
+                
+                <div class="mission-section">
+                    <h2>Future <span class="highlight">Directions</span></h2>
+                    <p>We are expanding our evaluation to include more medical specialties and creating a comprehensive leaderboard of model performance. Future versions will explore more complex clinical reasoning scenarios beyond the foundational knowledge currently tested.</p>
+                    
+                    <p>Our goal is to contribute to the responsible development of AI in healthcare by providing rigorous, transparent evaluations that highlight both capabilities and limitations of current models.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-logo">DEEPCALL</div>
+            <div class="footer-links">
+                <a href="index.html">Home</a>
+                <a href="benchmark.html">Benchmark</a>
+                <a href="mission.html">Mission</a>
+                <a href="contact.html">Contact</a>
+            </div>
+            <div class="footer-legal">
+                <p>© 2025 DEEPCALL Technology | Dr. Yohann Missiak</p>
+                <p>Research purposes only. Not for clinical use.</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>
