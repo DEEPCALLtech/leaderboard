@@ -1,0 +1,994 @@
+:root {
+    /* More subdued color palette */
+    --primary: #FF7D40;         /* Softened orange */
+    --primary-dark: #E04D35;    /* Deeper, less vibrant red */
+    --bg-dark: #121228;         /* Deeper, more muted background */
+    --bg-darker: #0A0A18;       /* Even darker background for contrast */
+    --accent-cyan: #2DBAA5;     /* Desaturated teal */
+    --accent-blue: #3B5CBA;     /* Professional blue */
+    --text-light: #E8E8E8;      /* Slightly off-white for reduced eye strain */
+    --text-secondary: #A0A0B0;  /* Subdued secondary text */
+    --glass-bg: rgba(30, 30, 50, 0.3);      /* Darker glass effect */
+    --glass-border: rgba(255, 255, 255, 0.08); /* Subtle borders */
+    --card-bg: rgba(18, 18, 40, 0.6);       /* Darker card backgrounds */
+    --success: #39A775;         /* Professional success green */
+    --warning: #D68227;         /* Toned down warning */
+    --error: #D64550;           /* Less harsh error red */
+}
+
+/* Reset and Base Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background: linear-gradient(145deg, var(--bg-dark), var(--bg-darker));
+    color: var(--text-light);
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+    line-height: 1.6;
+}
+
+/* Subtle Grid Background */
+.grid-background {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: 
+        linear-gradient(rgba(59, 92, 186, 0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(59, 92, 186, 0.05) 1px, transparent 1px);
+    background-size: 50px 50px;
+    z-index: -1;
+    transform: perspective(1000px) rotateX(60deg) scale(1.5);
+    opacity: 0.2;
+    transform-origin: center top;
+}
+
+/* More Professional Header */
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.25rem 5%;
+    background: rgba(10, 10, 24, 0.85);
+    backdrop-filter: blur(8px);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 20px rgba(0, 0, 0, 0.2);
+}
+
+.logo-container {
+    display: flex;
+    align-items: center;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+}
+
+/* More subtle logo with softer glow */
+.logo-icon {
+    position: relative;
+    width: 36px;
+    height: 36px;
+    margin-right: 12px;
+}
+
+.node {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: linear-gradient(145deg, var(--primary), var(--primary-dark));
+    box-shadow: 0 0 8px rgba(255, 125, 64, 0.5);
+}
+
+.node:nth-child(1) {
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.node:nth-child(2) {
+    top: 50%;
+    left: 10%;
+    transform: translateY(-50%);
+}
+
+.node:nth-child(3) {
+    top: 50%;
+    right: 10%;
+    transform: translateY(-50%);
+}
+
+.curve {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 50%;
+    border-bottom-left-radius: 20px;
+    border-bottom-right-radius: 20px;
+    border: 2px solid transparent;
+    border-image: linear-gradient(145deg, var(--primary), var(--primary-dark)) 1;
+    border-top: 0;
+    box-shadow: 0 0 8px rgba(255, 125, 64, 0.2);
+}
+
+.logo-text {
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 700;
+    font-size: 1.4rem;
+    background: linear-gradient(to right, var(--primary), var(--primary-dark));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    text-shadow: 0 0 3px rgba(255, 125, 64, 0.2);
+    letter-spacing: 0.05em;
+}
+
+/* More subtle navigation */
+nav ul {
+    display: flex;
+    list-style: none;
+}
+
+nav ul li {
+    margin-left: 2rem;
+}
+
+nav ul li a {
+    text-decoration: none;
+    color: var(--text-light);
+    font-size: 0.95rem;
+    position: relative;
+    transition: all 0.3s ease;
+    letter-spacing: 0.03em;
+    font-weight: 500;
+    padding: 0.5rem 0;
+}
+
+nav ul li a:after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: linear-gradient(to right, var(--primary), var(--accent-cyan));
+    transition: width 0.3s ease;
+    opacity: 0.8;
+}
+
+nav ul li a:hover:after,
+nav ul li a.active:after {
+    width: 100%;
+}
+
+nav ul li a:hover,
+nav ul li a.active {
+    color: var(--accent-cyan);
+}
+
+/* Main Content */
+main {
+    padding: 2rem 5%;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+/* Hero Section - More refined */
+.hero {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 60vh; /* Slightly shorter for more professional look */
+    text-align: center;
+    padding: 3rem 0;
+}
+
+/* Glass Panels - More subtle, less "glassy" */
+.glass-panel {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(8px);
+    border-radius: 12px;
+    padding: 2.5rem;
+    max-width: 800px;
+    width: 100%;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+}
+
+.wide {
+    max-width: 1200px;
+}
+
+/* Typography - More refined */
+h1 {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 3rem;
+    margin-bottom: 0.8rem;
+    letter-spacing: 0.05em;
+    font-weight: 700;
+}
+
+.subtitle {
+    font-size: 1.3rem;
+    color: var(--text-secondary);
+    margin-bottom: 1.8rem;
+    font-weight: 300;
+    letter-spacing: 0.02em;
+}
+
+.highlight {
+    color: var(--accent-cyan);
+    position: relative;
+}
+
+.highlight:after {
+    content: '';
+    position: absolute;
+    bottom: -3px;
+    left: 0;
+    width: 100%;
+    height: 1px;
+    background: var(--accent-cyan);
+    box-shadow: 0 0 5px var(--accent-cyan);
+    opacity: 0.7;
+}
+
+/* Buttons - More professional */
+.glow-button {
+    margin-top: 1.8rem;
+    display: inline-block;
+}
+
+.glow-button a {
+    display: inline-block;
+    padding: 0.9rem 1.8rem;
+    background: linear-gradient(45deg, var(--primary-dark), var(--primary));
+    color: white;
+    text-decoration: none;
+    border-radius: 6px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    box-shadow: 0 0 12px rgba(224, 77, 53, 0.4);
+    transition: all 0.3s ease;
+    font-size: 0.95rem;
+}
+
+.glow-button a:hover {
+    box-shadow: 0 0 15px rgba(224, 77, 53, 0.6);
+    transform: translateY(-2px);
+}
+
+/* Features Section - More aligned */
+.features {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin: 3rem 0;
+}
+
+/* Cards - More subtle */
+.glass-card {
+    background: var(--card-bg);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(8px);
+    border-radius: 10px;
+    padding: 1.8rem;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.glass-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+}
+
+.card-icon {
+    width: 50px;
+    height: 50px;
+    margin-bottom: 1.5rem;
+    border-radius: 8px;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.benchmark-icon {
+    background: linear-gradient(145deg, var(--primary-dark), var(--primary));
+    box-shadow: 0 0 10px rgba(224, 77, 53, 0.2);
+}
+
+.mission-icon {
+    background: linear-gradient(145deg, var(--accent-cyan), var(--accent-blue));
+    box-shadow: 0 0 10px rgba(45, 186, 165, 0.2);
+}
+
+.contact-icon {
+    background: linear-gradient(145deg, var(--accent-blue), #4A6BD5);
+    box-shadow: 0 0 10px rgba(59, 92, 186, 0.2);
+}
+
+/* Headers - More refined */
+h2 {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.6rem;
+    margin-bottom: 0.8rem;
+    letter-spacing: 0.04em;
+}
+
+h3 {
+    font-family: 'Inter', sans-serif;
+    font-size: 1.3rem;
+    font-weight: 600;
+    margin: 1.2rem 0 0.6rem;
+    color: var(--accent-cyan);
+    letter-spacing: 0.02em;
+}
+
+/* Paragraph styles */
+p {
+    margin-bottom: 1rem;
+    line-height: 1.7;
+    color: var(--text-light);
+}
+
+.glass-card p {
+    margin-bottom: 1.2rem;
+    line-height: 1.6;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+}
+
+/* Links - More subtle */
+.neon-link {
+    color: var(--accent-cyan);
+    text-decoration: none;
+    font-weight: 500;
+    position: relative;
+    transition: all 0.3s ease;
+    border-bottom: 1px solid rgba(45, 186, 165, 0.3);
+    padding-bottom: 1px;
+}
+
+.neon-link:hover {
+    color: var(--accent-cyan);
+    border-bottom-color: var(--accent-cyan);
+}
+
+/* Disclaimer - More professional */
+.disclaimer {
+    margin-top: 1.8rem;
+    padding: 1rem 1.5rem;
+    background: rgba(224, 77, 53, 0.08);
+    border-left: 2px solid var(--primary-dark);
+    border-radius: 4px;
+    font-size: 0.95rem;
+}
+
+/* Footer - Cleaner */
+footer {
+    background: rgba(10, 10, 24, 0.9);
+    padding: 2.5rem 5%;
+    margin-top: 4rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.footer-content {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.footer-logo {
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 700;
+    font-size: 1.3rem;
+    background: linear-gradient(to right, var(--primary), var(--primary-dark));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    letter-spacing: 0.05em;
+}
+
+.footer-links {
+    display: flex;
+    gap: 1.5rem;
+}
+
+.footer-links a {
+    color: var(--text-secondary);
+    text-decoration: none;
+    transition: color 0.3s ease;
+    font-size: 0.9rem;
+}
+
+.footer-links a:hover {
+    color: var(--accent-cyan);
+}
+
+.footer-legal {
+    width: 100%;
+    text-align: center;
+    margin-top: 2rem;
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    opacity: 0.8;
+}
+
+/* Benchmark Page Styles - More refined */
+.benchmark-hero {
+    min-height: 40vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem 0;
+}
+
+/* More professional disclaimer */
+.disclaimer-alert {
+    background-color: rgba(214, 77, 53, 0.08);
+    color: var(--text-light);
+    padding: 1.2rem 1.5rem;
+    margin: 1.5rem 0 1rem;
+    border-radius: 4px;
+    font-size: 0.95rem;
+    text-align: center;
+    border-left: 2px solid var(--primary-dark);
+}
+
+.benchmark-intro {
+    margin: 2rem 0;
+    display: flex;
+    justify-content: center;
+}
+
+.intro-text {
+    margin-top: 1.2rem;
+}
+
+.intro-text h3 {
+    margin: 1.3rem 0 0.8rem;
+    color: var(--accent-cyan);
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.3rem;
+}
+
+.coming-soon {
+    color: var(--primary);
+    margin: 1rem 0;
+    font-style: italic;
+    opacity: 0.9;
+    font-size: 0.95rem;
+}
+
+.benchmark-results {
+    margin: 2rem 0;
+    display: flex;
+    justify-content: center;
+}
+
+/* Filters - More professional */
+.filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    margin: 1.8rem 0;
+}
+
+.filter-group {
+    flex: 1;
+    min-width: 250px;
+}
+
+.filter-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+}
+
+.neon-select {
+    width: 100%;
+    padding: 0.7rem 1rem;
+    background: rgba(18, 18, 40, 0.6);
+    color: var(--text-light);
+    border: 1px solid rgba(45, 186, 165, 0.4);
+    border-radius: 4px;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.95rem;
+    appearance: none;
+    cursor: pointer;
+    box-shadow: 0 0 8px rgba(45, 186, 165, 0.15);
+    transition: all 0.3s ease;
+}
+
+.neon-select:hover, 
+.neon-select:focus {
+    box-shadow: 0 0 12px rgba(45, 186, 165, 0.25);
+    border-color: var(--accent-cyan);
+    outline: none;
+}
+
+/* Results Table - More professional */
+.results-container {
+    margin: 1.8rem 0;
+    overflow-x: auto;
+    position: relative;
+    border-radius: 4px;
+    background: rgba(18, 18, 40, 0.3);
+}
+
+/* Loading animation */
+.loading {
+    text-align: center;
+    padding: 2rem;
+    color: var(--accent-cyan);
+    font-size: 0.95rem;
+}
+
+.glow-spinner {
+    display: inline-block;
+    width: 2rem;
+    height: 2rem;
+    border: 2px solid rgba(45, 186, 165, 0.1);
+    border-radius: 50%;
+    border-top-color: var(--accent-cyan);
+    animation: spin 1s ease-in-out infinite;
+    margin-bottom: 1rem;
+}
+
+.glow-text {
+    display: block;
+    color: var(--accent-cyan);
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Table styling - Cleaner, more enterprise look */
+.results-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.95rem;
+}
+
+.results-table th {
+    background-color: rgba(30, 30, 50, 0.8);
+    color: var(--text-light);
+    border: 1px solid rgba(170, 170, 170, 0.15);
+    padding: 0.8rem 1rem;
+    text-align: left;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 0.9rem;
+    letter-spacing: 0.03em;
+}
+
+.results-table tr:nth-child(odd) {
+    background-color: rgba(30, 30, 50, 0.4);
+}
+
+.results-table tr:nth-child(even) {
+    background-color: rgba(30, 30, 50, 0.2);
+}
+
+.results-table td {
+    border: 1px solid rgba(170, 170, 170, 0.15);
+    padding: 0.8rem 1rem;
+    color: var(--text-light);
+}
+
+.green-text {
+    color: var(--success) !important;
+    font-weight: 600;
+    text-shadow: 0 0 3px rgba(57, 167, 117, 0.3);
+}
+
+.no-results {
+    color: var(--text-secondary);
+    padding: 2rem;
+    text-align: center;
+    font-style: italic;
+    font-size: 0.95rem;
+}
+
+.mini-disclaimer {
+    background-color: rgba(30, 30, 50, 0.6);
+    color: var(--text-secondary);
+    padding: 0.8rem 1rem;
+    margin: 1rem 0;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    text-align: center;
+    border-left: 2px solid var(--warning);
+}
+
+/* Mission Page - More corporate */
+.mission-hero {
+    min-height: 40vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem 0;
+}
+
+.mission-content {
+    margin: 2rem 0;
+    display: flex;
+    justify-content: center;
+}
+
+.mission-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    margin-bottom: 2rem;
+}
+
+.mission-text {
+    padding-right: 1rem;
+}
+
+.mission-image {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* More subtle image effects */
+.glow-image {
+    max-width: 100%;
+    border-radius: 6px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
+    border: 1px solid rgba(45, 186, 165, 0.2);
+}
+
+.glow-image:hover {
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.35), 0 0 15px rgba(45, 186, 165, 0.3);
+    transform: scale(1.01);
+}
+
+/* Professional list styling */
+.glow-list {
+    list-style: none;
+    padding-left: 0.5rem;
+    margin: 1rem 0 1.5rem;
+}
+
+.glow-list li {
+    position: relative;
+    padding: 0.4rem 0 0.4rem 1.8rem;
+    margin-bottom: 0.4rem;
+    font-size: 0.95rem;
+}
+
+.glow-list li::before {
+    content: "•";
+    position: absolute;
+    left: 0;
+    color: var(--accent-cyan);
+    font-size: 1.2rem;
+}
+
+.mission-section {
+    margin-top: 2.5rem;
+    padding-top: 1.2rem;
+    border-top: 1px solid rgba(45, 186, 165, 0.15);
+}
+
+.limitation-list {
+    list-style: none;
+    padding-left: 0;
+    margin: 1rem 0 1.5rem;
+}
+
+.limitation-list li {
+    position: relative;
+    padding: 0.4rem 0 0.4rem 1.8rem;
+    margin-bottom: 0.4rem;
+    font-size: 0.95rem;
+}
+
+.limitation-list li::before {
+    content: "⚠️";
+    position: absolute;
+    left: 0;
+    font-size: 0.9rem;
+}
+
+.disclaimer-box {
+    background: rgba(224, 77, 53, 0.08);
+    border-left: 2px solid var(--primary-dark);
+    padding: 1.2rem 1.5rem;
+    margin: 1.8rem 0;
+    border-radius: 4px;
+}
+
+.disclaimer-box h3 {
+    color: var(--primary);
+    margin-top: 0;
+    font-size: 1.1rem;
+}
+
+/* Contact Page - More corporate */
+.contact-hero {
+    min-height: 40vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem 0;
+}
+
+.contact-content {
+    margin: 2rem 0;
+    display: flex;
+    justify-content: center;
+}
+
+.contact-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+}
+
+.contact-info {
+    padding-right: 1rem;
+}
+
+.contact-detail {
+    display: flex;
+    margin: 1.8rem 0;
+    align-items: flex-start;
+}
+
+.contact-icon {
+    font-size: 1.5rem;
+    margin-right: 1rem;
+    color: var(--accent-cyan);
+    opacity: 0.9;
+}
+
+.contact-text h3 {
+    margin: 0 0 0.4rem 0;
+    color: var(--accent-cyan);
+    font-size: 1.1rem;
+}
+
+.contact-text p {
+    margin: 0.2rem 0;
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+}
+
+.contact-note {
+    margin-top: 1.8rem;
+    padding: 1rem 1.2rem;
+    background: rgba(45, 186, 165, 0.08);
+    border-radius: 4px;
+    border-left: 2px solid var(--accent-cyan);
+    font-size: 0.95rem;
+}
+
+.contact-form-container {
+    padding-left: 1rem;
+}
+
+.contact-form {
+    margin-top: 1.8rem;
+}
+
+.form-group {
+    margin-bottom: 1.2rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.4rem;
+    font-weight: 500;
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+}
+
+/* Form inputs - More professional */
+.neon-input {
+    width: 100%;
+    padding: 0.7rem 1rem;
+    background: rgba(18, 18, 40, 0.6);
+    color: var(--text-light);
+    border: 1px solid rgba(45, 186, 165, 0.4);
+    border-radius: 4px;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+}
+
+.neon-input:focus {
+    outline: none;
+    box-shadow: 0 0 12px rgba(45, 186, 165, 0.25);
+    border-color: var(--accent-cyan);
+}
+
+.submit-btn {
+    position: relative;
+    padding: 0.7rem 1.8rem;
+    background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    letter-spacing: 0.03em;
+}
+
+.submit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(224, 77, 53, 0.25);
+}
+
+.submit-btn:active {
+    transform: translateY(0);
+}
+
+.btn-text {
+    position: relative;
+    z-index: 1;
+}
+
+.form-status {
+    min-height: 1.5rem;
+    margin-top: 1rem;
+    padding: 0.5rem;
+    border-radius: 4px;
+    text-align: center;
+    font-size: 0.9rem;
+}
+
+.form-status.sending {
+    background: rgba(45, 186, 165, 0.08);
+    color: var(--accent-cyan);
+}
+
+.form-status.success {
+    background: rgba(57, 167, 117, 0.08);
+    color: var(--success);
+}
+
+.form-status.error {
+    background: rgba(214, 69, 80, 0.08);
+    color: var(--error);
+}
+
+.loading-spinner {
+    display: inline-block;
+    width: 1rem;
+    height: 1rem;
+    border: 2px solid rgba(45, 186, 165, 0.1);
+    border-top: 2px solid var(--accent-cyan);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-right: 0.5rem;
+    vertical-align: middle;
+}
+
+/* Responsive design - More professional, cleaner breakpoints */
+@media (max-width: 1100px) {
+    .mission-grid, .contact-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+    
+    .mission-image {
+        order: -1;
+        margin-bottom: 1rem;
+    }
+    
+    .contact-info, .contact-form-container {
+        padding: 0;
+    }
+    
+    .glass-panel {
+        padding: 2rem;
+    }
+}
+
+@media (max-width: 768px) {
+    header {
+        flex-direction: column;
+        padding: 1rem 5%;
+    }
+    
+    nav ul {
+        margin-top: 1rem;
+        width: 100%;
+        justify-content: center;
+    }
+    
+    nav ul li {
+        margin: 0 0.8rem;
+    }
+    
+    h1 {
+        font-size: 2.2rem;
+    }
+    
+    .subtitle {
+        font-size: 1.1rem;
+    }
+    
+    .mission-section {
+        margin-top: 1.8rem;
+        padding-top: 1rem;
+    }
+    
+    .features {
+        grid-template-columns: 1fr;
+    }
+    
+    .footer-content {
+        flex-direction: column;
+        gap: 1.2rem;
+        text-align: center;
+    }
+    
+    .footer-links {
+        justify-content: center;
+    }
+}
+
+@media (max-width: 480px) {
+    nav ul li {
+        margin: 0 0.5rem;
+    }
+    
+    .glass-panel {
+        padding: 1.5rem;
+    }
+    
+    h1 {
+        font-size: 1.8rem;
+    }
+    
+    .subtitle {
+        font-size: 1rem;
+    }
+    
+    .contact-detail {
+        flex-direction: column;
+    }
+    
+    .contact-icon {
+        margin-bottom: 0.5rem;
+    }
+    
+    .filters {
+        gap: 1rem;
+    }
+}
