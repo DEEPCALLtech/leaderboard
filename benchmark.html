@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DEEPCALL | Benchmark</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@300;400;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+</head>
+<body>
+    <div class="grid-background"></div>
+    
+    <header>
+        <div class="logo-container">
+            <div class="logo">
+                <!-- Stylized logo inspired by DEEPCALL -->
+                <div class="logo-icon">
+                    <div class="node"></div>
+                    <div class="node"></div>
+                    <div class="node"></div>
+                    <div class="curve"></div>
+                </div>
+                <div class="logo-text">DEEPCALL</div>
+            </div>
+        </div>
+        
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="benchmark.html" class="active">Benchmark</a></li>
+                <li><a href="mission.html">Mission</a></li>
+                <li><a href="contact.html">Contact</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section class="benchmark-hero">
+            <div class="glass-panel wide">
+                <h1>Medical LLM <span class="highlight">Benchmark</span></h1>
+                <p class="subtitle">Evaluating model performance on clinical questions</p>
+                <p class="version-info">Version 1.1</p>
+                
+                <!-- Strong liability disclaimer -->
+                <div class="disclaimer-alert">
+                    <strong>⚠️ IMPORTANT DISCLAIMER ⚠️</strong><br>
+                    ALL MODELS IN THIS EVALUATION, EVEN THOSE WITH 100% SCORES, ARE <strong>NOT SUITABLE FOR CLINICAL PRACTICE</strong>.<br>
+                    This is a private, experimental test only.<br> <b>Do not use any of these models for medical advice, diagnosis or treatment decisions</b>. <br>Refer to medical physicians.<br><br>
+                    DEEPCALL Technology and Dr. Yohann Missiak expressly disclaim all liability for any direct, indirect, incidental, special, exemplary, or consequential damages arising from the use of these test results. Users acknowledge that any reliance on this information is done at their own risk. The aforementioned parties shall not be liable for any claims, demands, or causes of action, whether in contract, tort, or otherwise, resulting from access to or use of the evaluation results. This evaluation is conducted strictly for research purposes, and neither DEEPCALL Technology nor Dr. Yohann Missiak assumes any responsibility for decisions made based on this information.
+                </div>
+            </div>
+        </section>
+
+        <section class="benchmark-intro">
+            <div class="glass-panel">
+                <h2>Private LLM Test <span class="highlight">Leaderboard</span></h2>
+                <p class="coming-soon"><strong>Coming Soon:</strong> July 2025 : 20 questions for <strong>MID</strong> difficulty, currently n = 9 results available July 2025. MID difficulty also updated for all Specialties. Curated by Doctor Yohann Missiak. Extensive Medical Specialties list now available.</p>
+                
+                <div class="intro-text">
+                    <h3>Research Goals & Purpose</h3>
+                    <p>The goal of this leaderboard is to provide a private evaluation that explores various knowledge domains and reasoning methods of small LLMs in the medicine context. This research aims to understand how these models perform on clinical cases with varying levels of difficulty, starting with EASY cases in this version.</p>
+                    <p>This work is part of a broader research effort to analyze reasoning patterns, knowledge representation, and domain-specific capabilities of language models, with potential applications in medical education and research tools development.</p>
+                
+                    <h3>Private Test Evaluation</h3>
+                    <p>This is a private test evaluation comparing small portable LLMs (under 13B parameters) on relevant medicine questions.</p>
+                    <p>The current difficulty levels are <strong>EASY</strong> & <strong>MID</strong>, representing foundational knowledge only.</p>
+                    <p>Models highlighted in green performed well on vital test questions, but this does not indicate medical reliability. A question was considered "vital" when an incorrect answer from the model LLM lead to a serious life-threatening condition.</p>
+                    <p>Current questions for <strong>EASY</strong> = 25, for <strong>MID</strong> = 9 (updating to 20 soon JULY update)</p>
+                    <p>Models were put "under stress" meaning they could face a clinical case of life-threatening critical situation. They were asked to take an action and provide a real definitive answer. Our dataset of Question/Answer intend to be the most relevant in terms of clinical benchmarking. Answers graded manually by Doctor Yohann Missiak MD.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="benchmark-results">
+            <div class="glass-panel wide">
+                <h2>Model <span class="highlight">Performance</span></h2>
+                
+                <div class="filters">
+                    <div class="filter-group">
+                        <label for="specialty-select">Select Specialty:</label>
+                        <select id="specialty-select" class="neon-select"></select>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label for="difficulty-select">Select Difficulty:</label>
+                        <select id="difficulty-select" class="neon-select"></select>
+                    </div>
+                </div>
+                
+                <div id="results-table" class="results-container">
+                    <div class="loading">Loading benchmark data...</div>
+                </div>
+                
+                <!-- Secondary disclaimer below table -->
+                <div class="mini-disclaimer">
+                    ⚠️ These results represent performance on a very limited set of test questions only. No model should be used for medical decision-making regardless of its score in this evaluation.
+                </div>
+            </div>
+        </section>
+
+        <section class="test-methodology">
+            <div class="glass-panel">
+                <h2>Test <span class="highlight">Methodology</span></h2>
+                <div class="methodology-text">
+                    <p>This private test evaluates small portable LLMs (under 13B parameters) on relevant medicine daily practice concepts. The research goal is to explore how different models approach clinical reasoning and domain-specific knowledge application. Goal is to test Small Models LLM. Due to GDPR and HIPAA legislation, LOCAL small LLMs seem to be the appropriate answer to respect patients privacy and patient-physician data use consent.</p>
+                    
+                    <p>Goal of this Private Evaluation: PRIVATE dataset of Questions/Answers in order to prevent data leakage and overfitting.</p>
+                    
+                    <h3>Test Difficulty Level: EASY</h3>
+                    <p>The current benchmark represents foundational knowledge in medicine. Future versions will explore more complex clinical reasoning scenarios.</p>
+                    
+                    <h3>Research Focus Areas:</h3>
+                    <p>- Knowledge representation in medical domains<br>
+                    - Reasoning patterns across different model architectures<br>
+                    - Performance on standardized clinical cases<br>
+                    - Domain adaptation capabilities</p>
+                    
+                    <h3>Important Limitations:</h3>
+                    <p>- This is an experimental research project, not a clinical validation<br>
+                    - Performance on this test does not indicate clinical competence or relevancy<br>
+                    - No LLM should be used for actual medical advice, diagnostics or decision-making<br>
+                    - This evaluation was not peer-reviewed or validated for clinical use<br>
+                    - Results are shared for research purposes only<br>
+                    - Dataset curated by Doctor Yohann Missiak Medical Doctor specialist of Chemical Pathology, clinical laboratory Director and Professor of Master CEMP AI Healthcare, Chichester</p>
+                    
+                    <div class="final-disclaimer">
+                        <strong>MEDICAL DISCLAIMER:</strong><br>
+                        This test evaluation is for experimental research purposes only. The author Dr Yohann Missiak makes no claims about the medical reliability of any of these models and expressly disclaims any liability for their use in any medical context.
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section class="model-similarity">
+            <div class="glass-panel">
+                <h2>Model <span class="highlight">Similarity Analysis</span></h2>
+                <p class="coming-soon"><em>Content coming soon...</em></p>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-logo">DEEPCALL</div>
+            <div class="footer-links">
+                <a href="index.html">Home</a>
+                <a href="benchmark.html">Benchmark</a>
+                <a href="mission.html">Mission</a>
+                <a href="contact.html">Contact</a>
+            </div>
+            <div class="footer-legal">
+                <p>© 2025 DEEPCALL Technology | Dr. Yohann Missiak</p>
+                <p>Research purposes only. Not for clinical use.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/benchmark.js"></script>
+</body>
+</html>
