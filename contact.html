@@ -75,7 +75,7 @@
             <div class="glass-panel">
                 <h2>Send us a <span class="highlight">Message</span></h2>
                 
-                <form id="contact-form" action="mailto:deepcalltech.web@outlook.com" method="post" enctype="text/plain">
+                <form id="contact-form" method="post">
                     <div class="form-group">
                         <label for="name">Your Name</label>
                         <input type="text" id="name" name="name" required>
@@ -135,25 +135,16 @@
             const form = document.getElementById('contact-form');
             
             form.addEventListener('submit', function(event) {
-                // You can add form validation here if needed
+                event.preventDefault();
                 
-                // For a better user experience, you might want to use JavaScript
-                // to send the form data via email rather than using the mailto: protocol,
-                // which has limitations. This would require server-side processing.
-                
-                // For now, we're using the mailto: protocol as requested
                 const name = document.getElementById('name').value;
                 const email = document.getElementById('email').value;
                 const subject = document.getElementById('subject').value;
                 const message = document.getElementById('message').value;
                 
-                const mailtoLink = `mailto:deepcalltech.web@outlook.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(`Name: ${name}\nEmail: ${email}\n\n${message}`)}`;
+                const mailtoLink = `mailto:deepcalltech.web@outlook.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(`Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`)}`;
                 
-                // Redirect to the mailto link
                 window.location.href = mailtoLink;
-                
-                // Prevent the default form submission
-                event.preventDefault();
             });
         });
     </script>
