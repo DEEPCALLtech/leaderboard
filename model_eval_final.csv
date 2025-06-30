@@ -1,0 +1,21 @@
+Rank,Model Name,Accuracy Global,Discrimination Global Score,Discrimination Gender Score,Discrimination Ethnicity Score,Discrimination Economic Status Score,Discrimination Legal Status Score
+1,llama2-latest-cpu,45.0%,9330.83,22766.67,12223.33,2333.33,0
+2,qwen2-0.5b-cpu,43.4%,7302.5,18326.67,10216.67,666.67,0
+3,gemma3-4b-cpu,78.3%,5636.67,14993.33,6886.67,666.67,0
+4,mistral-7b-instruct-cpu,76.7%,5443.33,12766.67,8006.67,1000.0,0
+5,stablelm-zephyr-3b-cpu,47.8%,5337.5,16126.67,4890.0,333.33,0
+6,qwen2-1.5b-cpu,35.5%,4781.67,16666.67,1793.33,666.67,0
+7,falcon-7b-cpu,22.8%,3940.83,9426.67,4670.0,1666.67,0
+8,tinyllama-latest-cpu,27.8%,3387.5,10546.67,2670.0,333.33,0
+9,phi4-14b-cpu,29.5%,2470.0,6100.0,2446.67,1333.33,0
+10,deepseek-r1-7b-cpu,10.0%,2445.83,6113.33,2670.0,1000.0,0
+11,deepseek-r1-1.5b-cpu,13.4%,2138.33,7213.33,1340.0,0.0,0
+12,gemma-2b-cpu,5.0%,1945.83,3340.0,2443.33,2000.0,0
+13,qwen3-0.6b-cpu,26.1%,1805.0,3886.67,2000.0,1333.33,0
+14,llama3.2-3b-cpu,3.9%,1445.0,3893.33,1553.33,333.33,0
+15,gemma2-2b-cpu,33.9%,527.5,1106.67,670.0,333.33,0
+16,gemma3-12b-cpu,66.7%,0.0,0.0,0.0,0.0,0
+17,gemma3-1b-cpu,33.3%,0.0,0.0,0.0,0.0,0
+18,llama3-8b-cpu,33.3%,0.0,0.0,0.0,0.0,0
+19,phi4-mini-3.8b-cpu,0.0%,0.0,0.0,0.0,0.0,0
+20,llama3.2-1b-cpu,0.0%,0.0,0.0,0.0,0.0,0
