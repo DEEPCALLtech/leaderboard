@@ -992,3 +992,161 @@ footer {
         gap: 1rem;
     }
 }
+
+
+/* Fix for table overlay issues */
+.glass-panel {
+    position: relative;
+    z-index: 1;
+    margin-bottom: 2rem; /* Add space between sections */
+    clear: both; /* Clear any floating elements */
+}
+
+.plot-container {
+    width: 100%;
+    min-height: 400px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+    padding: 1rem;
+    position: relative;
+    z-index: 2;
+    margin-bottom: 1rem;
+    overflow: hidden; /* Prevent content overflow */
+}
+
+.results-container {
+    position: relative;
+    z-index: 3;
+    margin-bottom: 1rem;
+    overflow-x: auto; /* Allow horizontal scrolling for wide tables */
+}
+
+.results-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+    overflow: hidden;
+    position: relative;
+    z-index: 4;
+    margin-bottom: 1rem;
+}
+
+/* Ensure sections don't overlap */
+.results-section,
+.fairness-plot-section,
+.fairness-table-section,
+.discrimination-rankings,
+.ethnicity-rankings,
+.discrimination-patterns,
+.analysis-results {
+    margin-bottom: 3rem; /* Increased spacing between sections */
+    position: relative;
+    z-index: auto;
+}
+
+/* Fix for Plotly graphs */
+.js-plotly-plot {
+    width: 100% !important;
+    height: auto !important;
+    position: relative !important;
+    z-index: 1 !important;
+}
+
+/* Ensure plotly divs don't overflow */
+.js-plotly-plot .plotly-graph-div {
+    width: 100% !important;
+    position: relative !important;
+}
+
+/* Table specific fixes */
+.results-table th,
+.results-table td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    position: relative;
+    z-index: auto;
+}
+
+.results-table th {
+    background: rgba(255, 255, 255, 0.1);
+    font-weight: 600;
+    color: #00d4ff;
+    position: sticky;
+    top: 0;
+    z-index: 5;
+}
+
+/* Container fixes */
+.glass-panel.wide {
+    width: 100%;
+    max-width: none;
+    box-sizing: border-box;
+    margin-bottom: 3rem;
+    position: relative;
+}
+
+/* Loading and error states */
+.loading, .error-message {
+    text-align: center;
+    padding: 2rem;
+    position: relative;
+    z-index: 1;
+}
+
+/* Responsive fixes */
+@media (max-width: 768px) {
+    .glass-panel {
+        margin-bottom: 1.5rem;
+    }
+    
+    .plot-container {
+        padding: 0.5rem;
+        min-height: 300px;
+    }
+    
+    .results-container {
+        overflow-x: auto;
+    }
+    
+    .results-table {
+        min-width: 600px; /* Ensure table doesn't get too cramped */
+    }
+}
+
+/* Clear floats and ensure proper stacking */
+.main::after,
+.glass-panel::after {
+    content: "";
+    display: table;
+    clear: both;
+}
+
+/* Plotly specific container fixes */
+div[id$="-plot"] {
+    width: 100%;
+    position: relative;
+    z-index: 1;
+    margin-bottom: 1rem;
+}
+
+/* Ensure proper spacing for all plot containers */
+#fairness-plot,
+#gender-plot,
+#ethnicity-plot,
+#discrimination-plots {
+    min-height: 400px;
+    width: 100%;
+    position: relative;
+    margin-bottom: 2rem;
+}
+
+/* Table container specific styling */
+#rankings-table,
+#fairness-table {
+    width: 100%;
+    position: relative;
+    z-index: 2;
+    margin: 1rem 0;
+}
