@@ -139,6 +139,9 @@ function sortResultsTable(data, sortBy) {
 }
 
 function createFairnessVsAccuracyPlot() {
+    // Clear loading message first
+    document.getElementById('fairness-plot').innerHTML = '';
+    
     // Merge fairness and performance data
     const mergedData = fairnessData.map(fairnessRow => {
         const performanceRow = performanceData.find(p => p.Model === fairnessRow.Model);
@@ -188,7 +191,7 @@ function createFairnessVsAccuracyPlot() {
             tickvals: [0, Math.pow(0.5, 2), Math.pow(0.8, 2), Math.pow(0.9, 2), Math.pow(0.95, 2), 1.0],
             ticktext: ['0%', '50%', '80%', '90%', '95%', '100%']
         },
-        height: 800,
+        height: 1000,
         shapes: [
             // Acceptable Fairness zone
             {
@@ -231,6 +234,17 @@ function createFairnessVsAccuracyPlot() {
                 bgcolor: 'rgba(173, 216, 230, 0.8)',
                 bordercolor: 'blue',
                 borderwidth: 1
+            },
+            {
+                x: -0.15, y: (Math.pow(0.95, 2) + 1.0) / 2,
+                xref: 'paper', yref: 'y',
+                text: 'Acceptable<br>Fairness<br>(95-100%)',
+                showarrow: false,
+                font: { size: 10, color: 'blue' },
+                bgcolor: 'rgba(173, 216, 230, 0.8)',
+                bordercolor: 'blue',
+                borderwidth: 1,
+                xanchor: 'center'
             }
         ]
     };
@@ -239,6 +253,9 @@ function createFairnessVsAccuracyPlot() {
 }
 
 function createFairnessRankingTable() {
+    // Clear loading message first
+    document.getElementById('fairness-table').innerHTML = '';
+    
     // Merge fairness and performance data
     const mergedData = fairnessData.map(fairnessRow => {
         const performanceRow = performanceData.find(p => p.Model === fairnessRow.Model);
@@ -287,9 +304,12 @@ function createFairnessRankingTable() {
 }
 
 function createGenderRankingPlot(data) {
+    // Clear loading message first
+    document.getElementById('gender-plot').innerHTML = '';
+    
     const genderColumn = findColumn(data, 'Gender', 'Score');
     if (!genderColumn) {
-        document.getElementById('gender-plot').innerHTML = '<p>No Gender discrimination data available</p>';
+        document.getElementById('gender-plot').innerHTML = '<div class="no-data-message">No Gender discrimination data available</div>';
         return;
     }
     
@@ -325,9 +345,12 @@ function createGenderRankingPlot(data) {
 }
 
 function createEthnicityRankingPlot(data) {
+    // Clear loading message first
+    document.getElementById('ethnicity-plot').innerHTML = '';
+    
     const ethnicityColumn = findColumn(data, 'Ethnicity', 'Score');
     if (!ethnicityColumn) {
-        document.getElementById('ethnicity-plot').innerHTML = '<p>No Ethnicity discrimination data available</p>';
+        document.getElementById('ethnicity-plot').innerHTML = '<div class="no-data-message">No Ethnicity discrimination data available</div>';
         return;
     }
     
@@ -363,15 +386,23 @@ function createEthnicityRankingPlot(data) {
 }
 
 function analyzeDiscriminationPatterns(data) {
+    // Clear loading message first
+    document.getElementById('discrimination-plots').innerHTML = '';
+    
     // This would implement the discrimination pattern analysis
     // For now, showing a placeholder
     document.getElementById('discrimination-plots').innerHTML = `
-        <p>Discrimination pattern analysis would be displayed here.</p>
-        <p>This would show patterns for models in top ${Math.floor(TOP_PERCENTILE_ACCURACY * 100)}% accuracy AND top ${Math.floor(TOP_PERCENTILE_DISCRIMINATION * 100)}% discrimination.</p>
+        <div class="analysis-placeholder">
+            <p>Discrimination pattern analysis would be displayed here.</p>
+            <p>This would show patterns for models in top ${Math.floor(TOP_PERCENTILE_ACCURACY * 100)}% accuracy AND top ${Math.floor(TOP_PERCENTILE_DISCRIMINATION * 100)}% discrimination.</p>
+        </div>
     `;
 }
 
 function generateConclusion(data) {
+    // Clear loading message first
+    document.getElementById('conclusion-section').innerHTML = '';
+    
     const bestModel = findBestModel(data);
     
     let conclusion = `
@@ -425,6 +456,9 @@ function findBestModel(data) {
 }
 
 function displayResultsTable(data) {
+    // Clear loading message first
+    document.getElementById('rankings-table').innerHTML = '';
+    
     const columns = [
         { key: 'Rank', header: 'Rank' },
         { key: 'Model Name', header: 'Model Name' },
@@ -489,4 +523,48 @@ function showError(message) {
     document.getElementById('rankings-table').innerHTML = errorHtml;
     document.getElementById('fairness-plot').innerHTML = errorHtml;
     document.getElementById('fairness-table').innerHTML = errorHtml;
+    document.getElementById('gender-plot').innerHTML = errorHtml;
+    document.getElementById('ethnicity-plot').innerHTML = errorHtml;
+    document.getElementById('discrimination-plots').innerHTML = errorHtml;
+    document.getElementById('conclusion-section').innerHTML = errorHtml;
+}
+
+// Add this function to fix layout issues
+function fixLayoutIssues() {
+    // Force Plotly to resize
+    const plotIds = ['fairness-plot', 'gender-plot', 'ethnicity-plot'];
+    plotIds.forEach(id => {
+        const element = document.getElementById(id);
+        if (element && element.firstChild) {
+            Plotly.Plots.resize(element);
+        }
+    });
+    
+    // Ensure proper spacing
+    const sections = document.querySelectorAll('.glass-panel');
+    sections.forEach((section, index) => {
+        section.style.marginBottom = '3rem';
+        section.style.position = 'relative';
+        section.style.zIndex = index + 1;
+    });
+}
+
+// Call this function after creating plots
+function runAnalysisWithLayoutFix() {
+    runAnalysis();
+    setTimeout(fixLayoutIssues, 500); // Give plots time to render
+}
+
+// Also call on window resize
+window.addEventListener('resize', () => {
+    setTimeout(fixLayoutIssues, 200);
+});
+
+// Replace the original event listeners
+function setupEventListeners() {
+    const analyzeBtn = document.getElementById('analyze-btn');
+    const sortMethod = document.getElementById('sort-method');
+    
+    analyzeBtn.addEventListener('click', runAnalysisWithLayoutFix);
+    sortMethod.addEventListener('change', runAnalysisWithLayoutFix);
 }
