@@ -100,7 +100,7 @@ function runAnalysis() {
         createGenderRankingPlot(sortedResults);
         createEthnicityRankingPlot(sortedResults);
         
-        // Analyze discrimination patterns with actual boxplots
+        // Analyze discrimination patterns
         analyzeDiscriminationPatterns(sortedResults);
         
         // Generate conclusion
@@ -139,7 +139,7 @@ function sortResultsTable(data, sortBy) {
 }
 
 function createFairnessVsAccuracyPlot() {
-    // Clear loading message first
+    // Clear previous content
     document.getElementById('fairness-plot').innerHTML = '';
     
     // Merge fairness and performance data
@@ -253,7 +253,7 @@ function createFairnessVsAccuracyPlot() {
 }
 
 function createFairnessRankingTable() {
-    // Clear loading message first
+    // Clear previous content
     document.getElementById('fairness-table').innerHTML = '';
     
     // Merge fairness and performance data
@@ -292,6 +292,7 @@ function createFairnessRankingTable() {
     
     const finalData = [...topPerformers, ...others];
     
+    // Removed "Legal" column from the table columns
     displayTable('fairness-table', finalData, [
         { key: 'finalRank', header: 'Final Rank' },
         { key: 'model', header: 'Model' },
@@ -304,7 +305,7 @@ function createFairnessRankingTable() {
 }
 
 function createGenderRankingPlot(data) {
-    // Clear loading message first
+    // Clear previous content
     document.getElementById('gender-plot').innerHTML = '';
     
     const genderColumn = findColumn(data, 'Gender', 'Score');
@@ -345,7 +346,7 @@ function createGenderRankingPlot(data) {
 }
 
 function createEthnicityRankingPlot(data) {
-    // Clear loading message first
+    // Clear previous content
     document.getElementById('ethnicity-plot').innerHTML = '';
     
     const ethnicityColumn = findColumn(data, 'Ethnicity', 'Score');
@@ -386,134 +387,24 @@ function createEthnicityRankingPlot(data) {
 }
 
 function analyzeDiscriminationPatterns(data) {
-    // Clear loading message first
+    // Clear previous content
     document.getElementById('discrimination-plots').innerHTML = '';
     
-    // Filter high accuracy and high discrimination models
-    const filteredModels = filterHighPerformingBiasedModels(data);
-    
-    if (filteredModels.length === 0) {
-        document.getElementById('discrimination-plots').innerHTML = `
-            <div class="analysis-placeholder">
-                <p>No models found in both top ${Math.floor(TOP_PERCENTILE_ACCURACY * 100)}% accuracy AND top ${Math.floor(TOP_PERCENTILE_DISCRIMINATION * 100)}% discrimination.</p>
-            </div>
-        `;
-        return;
-    }
-    
-    // Create container for both plots
+    // This would implement the discrimination pattern analysis
+    // For now, showing a placeholder
     document.getElementById('discrimination-plots').innerHTML = `
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem;">
-            <div>
-                <h4>Gender Discrimination Patterns</h4>
-                <div id="gender-pattern-plot"></div>
-            </div>
-            <div>
-                <h4>Ethnicity Discrimination Patterns</h4>
-                <div id="ethnicity-pattern-plot"></div>
-            </div>
+        <div class="analysis-placeholder">
+            <p>Discrimination pattern analysis would be displayed here.</p>
+            <p>This would show patterns for models in top ${Math.floor(TOP_PERCENTILE_ACCURACY * 100)}% accuracy AND top ${Math.floor(TOP_PERCENTILE_DISCRIMINATION * 100)}% discrimination.</p>
         </div>
     `;
-    
-    // Create Gender discrimination boxplot
-    createDiscriminationBoxplot(filteredModels, 'Gender', 'gender-pattern-plot');
-    
-    // Create Ethnicity discrimination boxplot
-    createDiscriminationBoxplot(filteredModels, 'Ethnicity', 'ethnicity-pattern-plot');
-}
-
-function filterHighPerformingBiasedModels(data) {
-    // Extract accuracy and discrimination scores
-    const modelScores = data.map(row => ({
-        model: row['Model Name'],
-        accuracy: parseFloat(row['Accuracy Global'].replace('%', '')),
-        discrimination: parseFloat(row['Discrimination Global Score'])
-    }));
-    
-    // Get top percentile thresholds
-    const accuracyThreshold = calculatePercentile(
-        modelScores.map(m => m.accuracy), 
-        100 - (TOP_PERCENTILE_ACCURACY * 100)
-    );
-    
-    const discriminationThreshold = calculatePercentile(
-        modelScores.map(m => m.discrimination), 
-        100 - (TOP_PERCENTILE_DISCRIMINATION * 100)
-    );
-    
-    // Filter models that are both high accuracy AND high discrimination
-    const filteredModelNames = modelScores
-        .filter(m => m.accuracy >= accuracyThreshold && m.discrimination >= discriminationThreshold)
-        .map(m => m.model);
-    
-    return data.filter(row => filteredModelNames.includes(row['Model Name']));
-}
-
-function createDiscriminationBoxplot(filteredModels, discriminationType, containerId) {
-    const column = findColumn(filteredModels, discriminationType, 'Score');
-    
-    if (!column) {
-        document.getElementById(containerId).innerHTML = `<p>No ${discriminationType} data available</p>`;
-        return;
-    }
-    
-    // Generate mock group data for demonstration
-    const mockGroups = generateMockGroupData(filteredModels, discriminationType);
-    
-    const traces = mockGroups.map((group, index) => ({
-        y: group.values,
-        type: 'box',
-        name: group.name,
-        marker: {
-            color: `rgba(${50 + index * 80}, ${100 + index * 50}, ${200 - index * 30}, 0.7)`
-        }
-    }));
-    
-    const layout = {
-        title: `${discriminationType} Discrimination Distribution`,
-        yaxis: { title: 'Discrimination Score' },
-        height: 400,
-        showlegend: true
-    };
-    
-    Plotly.newPlot(containerId, traces, layout, {responsive: true});
-}
-
-function generateMockGroupData(models, discriminationType) {
-    // Generate mock data for different groups
-    let groups;
-    
-    if (discriminationType === 'Gender') {
-        groups = ['Male', 'Female', 'Non-binary'];
-    } else if (discriminationType === 'Ethnicity') {
-        groups = ['White', 'Black/African American', 'Hispanic/Latino', 'Asian', 'Other'];
-    } else {
-        groups = ['Group A', 'Group B', 'Group C'];
-    }
-    
-    return groups.map(groupName => {
-        // Generate mock discrimination scores for each group
-        const values = models.map((model, index) => {
-            // Create some variation based on model index and group
-            const baseScore = Math.random() * 0.3 + 0.1; // 0.1 to 0.4
-            const groupVariation = (groupName.length % 3) * 0.1; // Some group-based variation
-            const modelVariation = (index % 5) * 0.05; // Some model-based variation
-            return Math.min(1.0, baseScore + groupVariation + modelVariation);
-        });
-        
-        return {
-            name: groupName,
-            values: values
-        };
-    });
 }
 
 function generateConclusion(data) {
-    // Clear loading message first
+    // Clear previous content
     document.getElementById('conclusion-section').innerHTML = '';
     
     const bestModel = findBestModel(data);
-    const filteredModels = filterHighPerformingBiasedModels(data);
     
     let conclusion = `
         <div class="conclusion-content">
@@ -538,7 +429,6 @@ function generateConclusion(data) {
                 <li><strong>Total Models Analyzed:</strong> ${data.length}</li>
                 <li><strong>Top ${Math.floor(TOP_PERCENTILE_ACCURACY * 100)}% Most Accurate Models:</strong> ${Math.floor(data.length * TOP_PERCENTILE_ACCURACY)}</li>
                 <li><strong>Top ${Math.floor(TOP_PERCENTILE_DISCRIMINATION * 100)}% Most Biased Models:</strong> ${Math.floor(data.length * TOP_PERCENTILE_DISCRIMINATION)}</li>
-                <li><strong>Models with Both High Accuracy & High Bias:</strong> ${filteredModels.length}</li>
             </ul>
             <p>This recommendation balances performance with fairness by selecting the most accurate model from among those with the lowest discrimination scores.</p>
         </div>
@@ -567,7 +457,7 @@ function findBestModel(data) {
 }
 
 function displayResultsTable(data) {
-    // Clear loading message first
+    // Clear previous content
     document.getElementById('rankings-table').innerHTML = '';
     
     const columns = [
@@ -577,12 +467,12 @@ function displayResultsTable(data) {
         { key: 'Discrimination Global Score', header: 'Discrimination Global Score' }
     ];
     
-    // Add discrimination columns that exist (exclude Legal Status)
+    // Add any discrimination columns that exist, but exclude any with "Legal" or "legal"
     const discriminationCols = Object.keys(data[0]).filter(key => 
         key.includes('Discrimination') && 
         key.includes('Score') && 
         !key.includes('Global') &&
-        !key.toLowerCase().includes('legal') // Exclude Legal Status columns
+        !key.toLowerCase().includes('legal')
     );
     
     discriminationCols.forEach(col => {
@@ -645,16 +535,12 @@ function showError(message) {
 
 // Add this function to fix layout issues
 function fixLayoutIssues() {
-    // Force Plotly to resize all plots
-    const plotIds = ['fairness-plot', 'gender-plot', 'ethnicity-plot', 'gender-pattern-plot', 'ethnicity-pattern-plot'];
+    // Force Plotly to resize
+    const plotIds = ['fairness-plot', 'gender-plot', 'ethnicity-plot'];
     plotIds.forEach(id => {
         const element = document.getElementById(id);
         if (element && element.firstChild) {
-            try {
-                Plotly.Plots.resize(element);
-            } catch (e) {
-                // Ignore resize errors
-            }
+            Plotly.Plots.resize(element);
         }
     });
     
@@ -670,7 +556,7 @@ function fixLayoutIssues() {
 // Call this function after creating plots
 function runAnalysisWithLayoutFix() {
     runAnalysis();
-    setTimeout(fixLayoutIssues, 1000); // Give plots time to render
+    setTimeout(fixLayoutIssues, 500); // Give plots time to render
 }
 
 // Also call on window resize
