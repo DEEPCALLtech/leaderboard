@@ -426,6 +426,18 @@ function replaceUnderscoresWithSpaces(modelName) {
     return String(modelName).replace(/_/g, ' ');
 }
 
+// Function to remove dashes and replace with spaces for table display only
+function cleanModelNameForTable(modelName) {
+    if (!modelName) return '';
+    return String(modelName).replace(/-/g, ' ').trim();
+}
+
+// Function to reattach weight to model name for graphs
+function reattachWeightToModelName(modelName, parameterSize) {
+    if (!modelName || !parameterSize) return modelName;
+    return `${modelName}-${parameterSize}`;
+}
+
 function populateSpecialtySelector() {
     const selector = document.getElementById('specialty-selector');
     if (!selector || !evaluationData) return;
@@ -499,7 +511,8 @@ function createModelComparisonTable(specialty) {
     tableData.forEach((row, index) => {
         row.Rank = index + 1;
         const extracted = extractParameterSize(row.Model);
-        row.Model = extracted.cleanedName;
+        // For table display: remove dashes and replace with spaces
+        row.Model = cleanModelNameForTable(extracted.cleanedName);
         row["Parameter Size"] = extracted.parameterSize;
     });
     
@@ -769,8 +782,11 @@ function createWeightAccuracyPlot() {
                 const accuracy = parseFloat(allSpecialtiesGeneral[modelCol]) || 0;
                 
                 if (!isNaN(weightValue) && weightValue > 0) {
+                    // For graph: reattach weight to model name
+                    const modelWithWeight = reattachWeightToModelName(extracted.cleanedName, paramSize);
+                    
                     weightData.push({
-                        model: extracted.cleanedName,
+                        model: modelWithWeight,
                         weight: weightValue,
                         accuracy: accuracy,
                         paramSize: paramSize
@@ -999,12 +1015,19 @@ function createModelSimilarityNetwork() {
         // Add model nodes and connect to specialties based on performance
         topModels.forEach(model => {
             const modelId = nodeId++;
-            const extracted = extractParameterSize(model.name);
-            const cleanModelName = extracted.cleanedName || model.name;
+            const finalName = replaceUnderscoresWithSpaces(
+                applyCharacterReplacements(
+                    applyExtension(model.name)
+                )
+            );
+            const extracted = extractParameterSize(finalName);
+            
+            // For network: reattach weight to model name
+            const modelWithWeight = reattachWeightToModelName(extracted.cleanedName, extracted.parameterSize);
             
             nodes.push({
                 id: modelId,
-                label: cleanModelName,
+                label: modelWithWeight,
                 group: 'model',
                 color: {
                     background: '#4ECDC4',
@@ -1020,7 +1043,7 @@ function createModelSimilarityNetwork() {
                     size: 12,
                     face: 'Arial'
                 },
-                title: `${cleanModelName}<br>Overall Accuracy: ${model.accuracy.toFixed(1)}%`
+                title: `${modelWithWeight}<br>Overall Accuracy: ${model.accuracy.toFixed(1)}%`
             });
             
             // Connect model to specialties based on performance
@@ -1044,7 +1067,7 @@ function createModelSimilarityNetwork() {
                                 highlight: '#FF6B6B'
                             },
                             width: 1 + connectionStrength * 3,
-                            title: `${cleanModelName} → ${specialty}: ${specialtyAccuracy.toFixed(1)}%`,
+                            title: `${modelWithWeight} → ${specialty}: ${specialtyAccuracy.toFixed(1)}%`,
                             length: 150 - connectionStrength * 50 // Shorter edges for stronger connections
                         });
                     }
@@ -1092,8 +1115,9 @@ function createModelSimilarityNetwork() {
             }
         };
         
+        // Create container structure with proper DOM elements
         container.innerHTML = `
-            <div style="
+            <div class="network-wrapper" style="
                 background: var(--background-fill-primary, rgba(255,255,255,0.05));
                 border-radius: 12px;
                 border: 1px solid var(--border-color-primary, rgba(255,255,255,0.1));
@@ -1102,51 +1126,67 @@ function createModelSimilarityNetwork() {
                 overflow: hidden;
             ">
                 <div id="network-vis" style="width: 100%; height: 600px;"></div>
+                <div class="network-legend" style="
+                    position: absolute;
+                    top: 15px;
+                    right: 15px;
+                    background: var(--background-fill-primary, rgba(255,255,255,0.9));
+                    backdrop-filter: blur(20px);
+                    padding: 16px;
+                    border-radius: 12px;
+                    border: 1px solid var(--border-color-primary, rgba(255,255,255,0.2));
+                    font-size: 12px;
+                    color: var(--body-text-color, #1f2937);
+                    box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+                    z-index: 1000;
+                    max-width: 200px;
+                ">
+                    <div style="margin-bottom: 12px; font-weight: 600; color: var(--body-text-color, #1f2937);">Network Legend</div>
+                    <div style="display: flex; align-items: center; margin-bottom: 8px;">
+                        <div style="width: 20px; height: 20px; background-color: #DC2626; border-radius: 50%; margin-right: 8px; border: 2px solid #B91C1C; flex-shrink: 0;"></div>
+                        <span>Medical Specialties</span>
+                    </div>
+                    <div style="display: flex; align-items: center; margin-bottom: 8px;">
+                        <div style="width: 16px; height: 16px; background-color: #4ECDC4; border-radius: 50%; margin-right: 8px; border: 2px solid #45B7AA; flex-shrink: 0;"></div>
+                        <span>Top ${percentile}% Models</span>
+                    </div>
+                    <div style="display: flex; align-items: center; margin-bottom: 8px;">
+                        <div style="width: 24px; height: 2px; background: linear-gradient(90deg, rgba(78, 205, 196, 0.3), rgba(78, 205, 196, 0.9)); margin-right: 8px; flex-shrink: 0;"></div>
+                        <span>Performance Links</span>
+                    </div>
+                    <div style="margin-top: 12px; padding-top: 8px; border-top: 1px solid var(--border-color-primary, rgba(255,255,255,0.2)); font-size: 11px; color: var(--body-text-color-secondary, #6b7280);">
+                        <div>Models: ${topModels.length}</div>
+                        <div>Specialties: ${specialties.length}</div>
+                        <div>Connections: ${edges.length}</div>
+                    </div>
+                </div>
             </div>
         `;
         
-        const network = new vis.Network(document.getElementById('network-vis'), data, options);
-        
-        // Add legend with enhanced styling
-        const legend = document.createElement('div');
-        legend.className = 'network-legend';
-        legend.style.cssText = `
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            background: var(--background-fill-primary, rgba(255,255,255,0.9));
-            backdrop-filter: blur(20px);
-            padding: 16px;
-            border-radius: 12px;
-            border: 1px solid var(--border-color-primary, rgba(255,255,255,0.2));
-            font-size: 12px;
-            color: var(--body-text-color, #1f2937);
-            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
-            z-index: 1000;
-        `;
-        
-        legend.innerHTML = `
-            <div style="margin-bottom: 12px; font-weight: 600; color: var(--body-text-color, #1f2937);">Network Legend</div>
-            <div style="display: flex; align-items: center; margin-bottom: 8px;">
-                <div style="width: 20px; height: 20px; background-color: #DC2626; border-radius: 50%; margin-right: 8px; border: 2px solid #B91C1C;"></div>
-                <span>Medical Specialties</span>
-            </div>
-            <div style="display: flex; align-items: center; margin-bottom: 8px;">
-                <div style="width: 16px; height: 16px; background-color: #4ECDC4; border-radius: 50%; margin-right: 8px; border: 2px solid #45B7AA;"></div>
-                <span>Top ${percentile}% Models</span>
-            </div>
-            <div style="display: flex; align-items: center; margin-bottom: 8px;">
-                <div style="width: 24px; height: 2px; background: linear-gradient(90deg, rgba(78, 205, 196, 0.3), rgba(78, 205, 196, 0.9)); margin-right: 8px;"></div>
-                <span>Performance Links</span>
-            </div>
-            <div style="margin-top: 12px; padding-top: 8px; border-top: 1px solid var(--border-color-primary, rgba(255,255,255,0.2)); font-size: 11px; color: var(--body-text-color-secondary, #6b7280);">
-                <div>Models: ${topModels.length}</div>
-                <div>Specialties: ${specialties.length}</div>
-                <div>Connections: ${edges.length}</div>
-            </div>
-        `;
-        
-        container.firstChild.appendChild(legend);
+        // Initialize the network after DOM is ready
+        const networkElement = document.getElementById('network-vis');
+        if (networkElement) {
+            const network = new vis.Network(networkElement, data, options);
+            
+            // Add event handlers for better interactivity
+            network.on("click", function(params) {
+                if (params.nodes.length > 0) {
+                    const nodeId = params.nodes[0];
+                    const node = nodes.find(n => n.id === nodeId);
+                    if (node) {
+                        console.log(`Clicked on: ${node.label} (${node.group})`);
+                    }
+                }
+            });
+            
+            network.on("hoverNode", function(params) {
+                const nodeId = params.node;
+                const node = nodes.find(n => n.id === nodeId);
+                if (node && node.group === 'model') {
+                    // Could add additional hover effects here
+                }
+            });
+        }
         
     } catch (error) {
         console.error('Error creating similarity network:', error);
@@ -1164,47 +1204,6 @@ function createModelSimilarityNetwork() {
             </div>
         `;
     }
-}
-
-function calculateCorrelation(x, y) {
-    const n = x.length;
-    if (n === 0 || n !== y.length) return 0;
-    
-    // Filter out any non-numeric values
-    const pairs = [];
-    for (let i = 0; i < n; i++) {
-        const xVal = parseFloat(x[i]);
-        const yVal = parseFloat(y[i]);
-        if (!isNaN(xVal) && !isNaN(yVal)) {
-            pairs.push([xVal, yVal]);
-        }
-    }
-    
-    if (pairs.length < 2) return 0;
-    
-    const xValues = pairs.map(p => p[0]);
-    const yValues = pairs.map(p => p[1]);
-    const count = pairs.length;
-    
-    const meanX = xValues.reduce((a, b) => a + b, 0) / count;
-    const meanY = yValues.reduce((a, b) => a + b, 0) / count;
-    
-    let numerator = 0;
-    let sumXSquared = 0;
-    let sumYSquared = 0;
-    
-    for (let i = 0; i < count; i++) {
-        const dx = xValues[i] - meanX;
-        const dy = yValues[i] - meanY;
-        numerator += dx * dy;
-        sumXSquared += dx * dx;
-        sumYSquared += dy * dy;
-    }
-    
-    const denominator = Math.sqrt(sumXSquared * sumYSquared);
-    if (denominator === 0) return 0;
-    
-    return numerator / denominator;
 }
 
 function showError(message) {
