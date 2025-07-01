@@ -1776,3 +1776,37 @@ footer {
     justify-content: center;
     justify-items: center;
 }
+
+
+
+
+/* Center the values grid */
+.values-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    padding: 3rem 2rem;
+    max-width: 1200px;
+    margin: 0 auto; /* This centers the grid */
+    justify-items: center; /* This centers each card within its grid cell */
+}
+
+/* Ensure cards are centered */
+.values-card {
+    width: 100%;
+    max-width: 350px; /* Control maximum width of each card */
+    margin: 0 auto; /* Center each card */
+}
+
+/* Center the content inside each card */
+.values-card .values-icon {
+    margin: 0 auto 1.5rem; /* Center the icon */
+}
+
+.values-card h3 {
+    text-align: center; /* Center the heading */
+}
+
+.values-card p {
+    text-align: center; /* Center the paragraph text */
+}
