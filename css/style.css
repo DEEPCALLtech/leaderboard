@@ -1263,3 +1263,119 @@ footer {
     opacity: 1;
 }
 
+
+
+/* Enhanced Values Section Styling */
+.values-intro {
+    position: relative;
+    overflow: hidden;
+}
+
+.values-intro::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(0, 255, 255, 0.05) 0%, transparent 70%);
+    animation: rotate-glow 20s linear infinite;
+    pointer-events: none;
+}
+
+@keyframes rotate-glow {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Cool Values Grid with Staggered Animation */
+.values-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    padding: 3rem 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.values-card {
+    position: relative;
+    background: rgba(255, 255, 255, 0.03);
+    border: 2px solid rgba(0, 255, 255, 0.2);
+    border-radius: 20px;
+    padding: 2.5rem 2rem;
+    backdrop-filter: blur(15px);
+    transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    overflow: hidden;
+    transform: translateY(20px);
+    opacity: 0;
+    animation: slideInUp 0.8s ease-out forwards;
+}
+
+.values-card:nth-child(1) { animation-delay: 0.1s; }
+.values-card:nth-child(2) { animation-delay: 0.2s; }
+.values-card:nth-child(3) { animation-delay: 0.3s; }
+.values-card:nth-child(4) { animation-delay: 0.4s; }
+
+@keyframes slideInUp {
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.values-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(0, 255, 255, 0.1), transparent);
+    transition: left 0.6s ease;
+}
+
+.values-card:hover::before {
+    left: 100%;
+}
+
+.values-card:hover {
+    transform: translateY(-15px) scale(1.02);
+    border-color: rgba(0, 255, 255, 0.6);
+    box-shadow: 
+        0 20px 40px rgba(0, 255, 255, 0.2),
+        0 0 30px rgba(0, 255, 255, 0.3),
+        inset 0 0 20px rgba(0, 255, 255, 0.1);
+}
+
+/* Enhanced Values Icons */
+.values-icon {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 1.5rem;
+    border-radius: 50%;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    transition: all 0.4s ease;
+}
+
+.values-icon::before {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: conic-gradient(from 0deg, #00ffff, #0080ff, #8000ff, #ff0080, #ff8000, #ffff00, #00ffff);
+    animation: spin-border 3s linear infinite;
+    padding: 3px;
+    mask: radial-gradient(circle, transparent 35px, black 37px);
+    -webkit-mask: radial-gradient(circle, transparent 35px, black 37px);
+}
+
+.values-icon::after {
+    position: absolute;
+    font-size: 2.5rem;
+    z-index: 2
