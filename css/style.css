@@ -1027,4 +1027,239 @@ footer {
         padding: 1.5rem;
     }
     
+
+
+
+
+
+
+    /* Benchmark Selection Styles */
+.benchmark-selection {
+    padding: 4rem 0;
+    min-height: 60vh;
+    display: flex;
+    align-items: center;
+}
+
+.benchmark-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 0 2rem;
+}
+
+.benchmark-box {
+    position: relative;
+    display: block;
+    text-decoration: none;
+    color: inherit;
+    background: rgba(255, 255, 255, 0.03);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    padding: 3rem 2rem;
+    text-align: center;
+    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    backdrop-filter: blur(10px);
+    overflow: hidden;
+    min-height: 280px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+/* Animated glow effect */
+.box-glow {
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(0, 255, 255, 0.1) 0%, transparent 70%);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    pointer-events: none;
+}
+
+.benchmark-box:hover .box-glow {
+    opacity: 1;
+    animation: pulse-glow 2s infinite;
+}
+
+@keyframes pulse-glow {
+    0%, 100% { transform: scale(1); opacity: 0.1; }
+    50% { transform: scale(1.1); opacity: 0.2; }
+}
+
+/* Box icons with floating animation */
+.box-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    filter: drop-shadow(0 0 20px rgba(0, 255, 255, 0.6));
+    animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+}
+
+.benchmark-box h2 {
+    font-size: 1.8rem;
+    margin: 1rem 0;
+    font-family: 'Orbitron', monospace;
+    color: #ffffff;
+    text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+}
+
+/* Animated divider */
+.box-divider {
+    width: 60px;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, #00ffff, transparent);
+    margin: 1rem auto;
+    border-radius: 2px;
+    transition: width 0.3s ease;
+}
+
+.benchmark-box:hover .box-divider {
+    width: 120px;
+    animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+    0% { background-position: -100px 0; }
+    100% { background-position: 100px 0; }
+}
+
+.benchmark-box p {
+    font-size: 1.1rem;
+    color: #cccccc;
+    margin: 1.5rem 0;
+    line-height: 1.5;
+}
+
+/* Stats badges */
+.box-stats {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+    margin-top: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.stat-badge {
+    background: rgba(0, 255, 255, 0.1);
+    border: 1px solid rgba(0, 255, 255, 0.3);
+    padding: 0.4rem 0.8rem;
+    border-radius: 15px;
+    font-size: 0.8rem;
+    color: #00ffff;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+/* Hover arrow */
+.hover-arrow {
+    position: absolute;
+    bottom: 1.5rem;
+    right: 2rem;
+    font-size: 1.5rem;
+    color: #00ffff;
+    opacity: 0;
+    transform: translateX(-10px);
+    transition: all 0.3s ease;
+}
+
+.benchmark-box:hover .hover-arrow {
+    opacity: 1;
+    transform: translateX(0);
+    animation: bounce-arrow 1s infinite;
+}
+
+@keyframes bounce-arrow {
+    0%, 100% { transform: translateX(0); }
+    50% { transform: translateX(5px); }
+}
+
+/* Specific box hover effects */
+.specialties-box:hover {
+    border-color: rgba(0, 255, 255, 0.6);
+    box-shadow: 
+        0 0 30px rgba(0, 255, 255, 0.3),
+        inset 0 0 30px rgba(0, 255, 255, 0.1);
+    transform: translateY(-10px) scale(1.02);
+}
+
+.bias-box:hover {
+    border-color: rgba(255, 107, 53, 0.6);
+    box-shadow: 
+        0 0 30px rgba(255, 107, 53, 0.3),
+        inset 0 0 30px rgba(255, 107, 53, 0.1);
+    transform: translateY(-10px) scale(1.02);
+}
+
+.bias-box .box-icon,
+.bias-box h2 {
+    color: #ff6b35;
+    text-shadow: 0 0 10px rgba(255, 107, 53, 0.5);
+    filter: drop-shadow(0 0 20px rgba(255, 107, 53, 0.6));
+}
+
+.bias-box .box-divider {
+    background: linear-gradient(90deg, transparent, #ff6b35, transparent);
+}
+
+.bias-box .stat-badge {
+    background: rgba(255, 107, 53, 0.1);
+    border-color: rgba(255, 107, 53, 0.3);
+    color: #ff6b35;
+}
+
+.bias-box .hover-arrow {
+    color: #ff6b35;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .benchmark-grid {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+        padding: 0 1rem;
+    }
     
+    .benchmark-box {
+        padding: 2rem 1.5rem;
+        min-height: 250px;
+    }
+    
+    .box-icon {
+        font-size: 3rem;
+    }
+    
+    .benchmark-box h2 {
+        font-size: 1.5rem;
+    }
+}
+
+/* Additional cute animations */
+@keyframes sparkle {
+    0%, 100% { opacity: 0; transform: scale(0); }
+    50% { opacity: 1; transform: scale(1); }
+}
+
+.benchmark-box::before {
+    content: "✨";
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    opacity: 0;
+    animation: sparkle 2s infinite;
+    animation-delay: 1s;
+}
+
+.benchmark-box:hover::before {
+    opacity: 1;
+}
+
