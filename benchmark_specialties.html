@@ -1,1 +1,192 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DEEPCALL | Medical LLM Specialties Evaluation</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@300;400;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+</head>
+<body>
+    <div class="grid-background"></div>
+    
+    <header>
+        <div class="logo-container">
+            <div class="logo">
+                <div class="logo-icon">
+                    <div class="node"></div>
+                    <div class="node"></div>
+                    <div class="node"></div>
+                    <div class="curve"></div>
+                </div>
+                <div class="logo-text">DEEPCALL</div>
+            </div>
+        </div>
+        
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="benchmark.html">Bias Analysis</a></li>
+                <li><a href="benchmark_specialties.html" class="active">Specialties</a></li>
+                <li><a href="mission.html">Mission</a></li>
+                <li><a href="contact.html">Contact</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <!-- Hero Section with Version Info -->
+        <section class="specialties-hero">
+            <div class="glass-panel wide">
+                <h1>Medical LLM <span class="highlight">Specialties Evaluation</span></h1>
+                <p class="subtitle">Doctor Yohann Missiak Medicine Small LLM Private Evaluation v1.1</p>
+                <p class="version-info">Coming Soon: July 2025 : 500 total questions, currently expanding the question dataset to identify bias and discrimination (AI Act EU). Extensive Medical Specialties list now available.</p>
+                
+                <!-- Strong liability disclaimer -->
+                <div class="disclaimer-alert critical">
+                    <h3>⚠️ IMPORTANT DISCLAIMER ⚠️</h3>
+                    <p><strong>ALL MODELS IN THIS EVALUATION, EVEN THOSE WITH 100% SCORES, ARE NOT SUITABLE FOR CLINICAL PRACTICE.</strong></p>
+                    <p>This is a private, experimental test only. <strong>Do not use any of these models for medical advice, diagnosis or treatment decisions</strong>. Refer to medical physicians.</p>
+                    
+                    <p><strong>LIABILITY DISCLAIMER:</strong> DEEPCALL Technology and Dr. Yohann Missiak expressly disclaim all liability for any direct, indirect, incidental, special, exemplary, or consequential damages arising from the use of these test results. Users acknowledge that any reliance on this information is done at their own risk. The aforementioned parties shall not be liable for any claims, demands, or causes of action, whether in contract, tort, or otherwise, resulting from access to or use of the evaluation results. This evaluation is conducted strictly for research purposes, and neither DEEPCALL Technology nor Dr. Yohann Missiak assumes any responsibility for decisions made based on this information.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Research Goals Section -->
+        <section class="research-goals">
+            <div class="glass-panel">
+                <h2>📊 Research Goals & <span class="highlight">Purpose</span></h2>
+                <div class="research-content">
+                    <p>The goal of this leaderboard is to provide a private evaluation that explores various knowledge domains and reasoning methods of small LLMs in the medicine context. This research aims to understand how these models perform on clinical cases covering knowledge, action, emergency, diagnostic, disease identification, and real life situation scenarios.</p>
+                    
+                    <p>This work is part of a broader research effort to analyze reasoning patterns, knowledge representation, and domain-specific capabilities of language models, with potential applications in medical education and research tools development.</p>
+                    
+                    <h3>Private Test Evaluation</h3>
+                    <p>This is a private test evaluation comparing small portable LLMs (under 13B parameters) on 500 relevant medicine questions from different specialties divided into knowledge, action, emergency, diagnostic, disease identification, and real life situation categories.</p>
+                    
+                    <p>Models highlighted in green performed well on vital test questions, but this does not indicate medical reliability. A question was considered "vital" when an incorrect answer from the model LLM lead to a serious life-threatening condition.</p>
+                    
+                    <p>Models were put "under stress" meaning they could face a clinical case of life-threatening critical situation. They were asked to take an action and provide a real definitive answer. Our dataset of Question/Answer intend to be the most relevant in terms of clinical benchmarking. Answers graded manually by Doctor Yohann Missiak MD.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Specialty Selection and Results -->
+        <section class="specialty-analysis">
+            <div class="glass-panel wide">
+                <h2>🏥 Test <span class="highlight">Leaderboard</span></h2>
+                
+                <div class="control-group">
+                    <label for="specialty-selector">Select Medical Specialty:</label>
+                    <select id="specialty-selector" class="neon-select">
+                        <option value="">Loading specialties...</option>
+                    </select>
+                </div>
+                
+                <div id="leaderboard-table" class="results-container">
+                    <div class="loading">Loading specialty evaluation data...</div>
+                </div>
+                
+                <!-- Secondary disclaimer -->
+                <div class="disclaimer-alert">
+                    <p>⚠️ These results represent performance on a limited set of test questions only. No model should be used for medical decision-making regardless of its score in this evaluation.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Model Weight vs Accuracy Analysis -->
+        <section class="weight-analysis">
+            <div class="glass-panel wide">
+                <h2>📊 Model Weight vs <span class="highlight">Accuracy Analysis</span></h2>
+                <div id="weight-accuracy-plot" class="plot-container">
+                    <div class="loading">Analyzing model weights and accuracy...</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Network Graph for Model Similarity -->
+        <section class="network-analysis">
+            <div class="glass-panel wide">
+                <h2>🔗 Model Similarity <span class="highlight">Network</span></h2>
+                <p class="network-info">This network graph clusters models based on their performance similarity across different medical specialties. Models with similar performance patterns are grouped together.</p>
+                <div id="similarity-network" class="network-container">
+                    <div class="loading">Building model similarity network...</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Methodology Section -->
+        <section class="methodology-section">
+            <div class="glass-panel">
+                <h2>Test <span class="highlight">Methodology</span></h2>
+                <div class="methodology-text">
+                    <h3>Private Test Methodology</h3>
+                    <p>This private test evaluates small portable LLMs (under 13B parameters) on 500 relevant medicine questions from different specialties divided into knowledge, action, emergency, diagnostic, disease identification, and real life situation categories. The research goal is to explore how different models approach clinical reasoning and domain-specific knowledge application.</p>
+                    
+                    <p>Goal is to test Small Models LLM. Due to GDPR and HIPAA legislation, LOCAL small LLMs seem to be the appropriate answer to respect patients privacy and patient-physician data use consent.</p>
+                    
+                    <h3>Goal of this Private Evaluation</h3>
+                    <p>PRIVATE dataset of Questions/Answers in order to prevent data leakage and overfitting.</p>
+                    
+                    <h3>Question Categories:</h3>
+                    <ul>
+                        <li><strong>Knowledge:</strong> Foundational medical knowledge</li>
+                        <li><strong>Action:</strong> Clinical decision-making scenarios</li>
+                        <li><strong>Emergency:</strong> Critical situation management</li>
+                        <li><strong>Diagnostic:</strong> Disease identification and differential diagnosis</li>
+                        <li><strong>Disease identification:</strong> Specific pathology recognition</li>
+                        <li><strong>Real life situation:</strong> Practical clinical scenarios</li>
+                    </ul>
+                    
+                    <h3>Research Focus Areas:</h3>
+                    <ul>
+                        <li>Knowledge representation in medical domains</li>
+                        <li>Reasoning patterns across different model architectures</li>
+                        <li>Performance on standardized clinical cases</li>
+                        <li>Domain adaptation capabilities</li>
+                    </ul>
+                    
+                    <h3>Important Limitations:</h3>
+                    <ul>
+                        <li>This is an experimental research project, not a clinical validation</li>
+                        <li>Performance on this test does not indicate clinical competence or relevancy</li>
+                        <li>No LLM should be used for actual medical advice, diagnostics or decision-making</li>
+                        <li>This evaluation was not peer-reviewed or validated for clinical use</li>
+                        <li>Results are shared for research purposes only</li>
+                        <li>Dataset curated by Doctor Yohann Missiak Medical Doctor specialist of Chemical Pathology, clinical laboratory Director and Professor of Master CEMP AI Healthcare, Chichester</li>
+                    </ul>
+                    
+                    <div class="final-disclaimer">
+                        <strong>MEDICAL DISCLAIMER:</strong><br>
+                        This test evaluation is for experimental research purposes only. The author Dr Yohann Missiak makes no claims about the medical reliability of any of these models and expressly disclaims any liability for their use in any medical context.
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-logo">DEEPCALL</div>
+            <div class="footer-links">
+                <a href="index.html">Home</a>
+                <a href="benchmark.html">Bias Analysis</a>
+                <a href="benchmark_specialties.html">Specialties</a>
+                <a href="mission.html">Mission</a>
+                <a href="contact.html">Contact</a>
+            </div>
+            <div class="footer-legal">
+                <p>© 2025 DEEPCALL Technology | Dr. Yohann Missiak</p>
+                <p>Private Test Evaluation by Dr. Yohann Missiak MD -- For Research Purposes Only</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/specialties.js"></script>
+</body>
+</html>
