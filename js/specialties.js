@@ -1,6 +1,6 @@
 // Configuration constants
 const VERSION = "1.1";
-const UPCOMING = "July 2025 : 500 total questions, currently expanding the question dataset to identify bias and discrimination (AI Act EU). Extensive Medical Specialties list now available.";
+const UPCOMING = "July 2025 : 1400 total questions divided into easy questions and specialties, currently expanding the question dataset to identify bias and discrimination (AI Act EU). Extensive Medical Specialties list now available.";
 
 // Global data storage
 let evaluationData = null;
@@ -21,6 +21,11 @@ function setupEventListeners() {
     const specialtySelector = document.getElementById('specialty-selector');
     if (specialtySelector) {
         specialtySelector.addEventListener('change', updateTable);
+    }
+    
+    const percentileInput = document.getElementById('network-percentile');
+    if (percentileInput) {
+        percentileInput.addEventListener('change', createModelSimilarityNetwork);
     }
 }
 
@@ -88,7 +93,7 @@ async function loadAllData() {
         // Create weight vs accuracy plot
         createWeightAccuracyPlot();
         
-        // Create model similarity network
+        // Create model similarity network with default 1%
         createModelSimilarityNetwork();
         
     } catch (error) {
@@ -233,8 +238,11 @@ function processEvaluationData(data) {
         Difficulty: row.Difficulty || 'MID'
     }));
     
-    // Filter to only keep MID difficulty rows
-    df = df.filter(row => row.Difficulty && String(row.Difficulty).toUpperCase() === 'MID');
+    // Filter to keep both MID and EASY difficulty rows
+    df = df.filter(row => {
+        const difficulty = String(row.Difficulty).toUpperCase();
+        return difficulty === 'MID' || difficulty === 'EASY';
+    });
     
     // Process Nutrition specialty rows
     const nutritionRows = df.filter(row => 
@@ -511,43 +519,150 @@ function createModelComparisonTable(specialty) {
 
 function getColoredTable(data) {
     if (!data || data.length === 0) {
-        return "<div style='color: var(--body-text-color, #333); padding:20px; text-align:center;'>No models with non-zero scores in this category.</div>";
+        return `
+            <div style='
+                color: var(--body-text-color, #666); 
+                padding: 20px; 
+                text-align: center;
+                background: var(--background-fill-primary, rgba(255,255,255,0.05));
+                border-radius: 12px;
+                border: 1px solid var(--border-color-primary, rgba(255,255,255,0.1));
+                backdrop-filter: blur(10px);
+            '>
+                No models with non-zero scores in this category.
+            </div>
+        `;
     }
     
-    let html = "<table style='width:100%; border-collapse: collapse;'>";
+    let html = `
+        <table style='
+            width: 100%; 
+            border-collapse: collapse; 
+            background: var(--background-fill-primary, rgba(255,255,255,0.95)); 
+            border-radius: 16px; 
+            overflow: hidden; 
+            box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+            border: 1px solid var(--border-color-primary, rgba(255,255,255,0.18));
+            backdrop-filter: blur(20px);
+        '>
+    `;
     
-    // Header
-    html += "<tr style='background-color: var(--table-even-background-fill, #f8f9fa); color: var(--body-text-color, #333); font-weight: bold;'>";
+    // Header with dark mode compatible gradient
+    html += `
+        <tr style='
+            background: var(--table-header-background, linear-gradient(135deg, #667eea 0%, #764ba2 100%)); 
+            color: var(--table-header-text, #ffffff); 
+            font-weight: 600;
+        '>
+    `;
     Object.keys(data[0]).forEach(col => {
-        html += `<th style='border:1px solid var(--border-color-primary, #ddd); padding:8px; text-align:left;'>${col}</th>`;
+        html += `
+            <th style='
+                border: none; 
+                padding: 18px 16px; 
+                text-align: left;
+                font-size: 14px;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+                font-weight: 600;
+            '>
+                ${col}
+            </th>
+        `;
     });
     html += "</tr>";
     
-    // Data rows
+    // Data rows with enhanced dark mode support
     data.forEach((row, i) => {
-        const bgColor = i % 2 === 0 ? "var(--table-odd-background-fill, #ffffff)" : "var(--table-even-background-fill, #f8f9fa)";
-        html += `<tr style='background-color:${bgColor};'>`;
+        const isEven = i % 2 === 0;
+        const bgColor = isEven 
+            ? "var(--table-even-background-fill, rgba(248,249,250,0.4))" 
+            : "var(--table-odd-background-fill, rgba(255,255,255,0.6))";
+        const hoverColor = "var(--table-row-hover, rgba(99, 102, 241, 0.15))";
+        
+        html += `
+            <tr style='
+                background: ${bgColor}; 
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                border-bottom: 1px solid var(--border-color-primary, rgba(255,255,255,0.08));
+                backdrop-filter: blur(10px);
+            ' 
+            onmouseover='this.style.background="${hoverColor}"; this.style.transform="translateY(-2px)"; this.style.boxShadow="0 4px 16px rgba(0,0,0,0.1)";' 
+            onmouseout='this.style.background="${bgColor}"; this.style.transform="translateY(0)"; this.style.boxShadow="none";'>
+        `;
         
         Object.keys(row).forEach(col => {
             if (col === 'Model') {
                 // Color green when Vital Accuracy is 100%
                 const vitalAccuracy = parseFloat(row['Vital Accuracy']) || 0;
                 const isVitalPerfect = vitalAccuracy === 100;
-                const color = isVitalPerfect ? '#4CAF50' : 'var(--body-text-color, #333)';
-                const fontWeight = isVitalPerfect ? 'bold' : 'normal';
-                html += `<td style='border:1px solid var(--border-color-primary, #ddd); padding:8px; color:${color}; font-weight:${fontWeight};'>${row[col] || ''}</td>`;
+                const color = isVitalPerfect 
+                    ? 'var(--success-color, #10B981)' 
+                    : 'var(--body-text-color, #1f2937)';
+                const fontWeight = isVitalPerfect ? '700' : '500';
+                const glow = isVitalPerfect ? 'text-shadow: 0 0 8px rgba(16, 185, 129, 0.3);' : '';
+                
+                html += `
+                    <td style='
+                        border: none; 
+                        padding: 16px; 
+                        color: ${color}; 
+                        font-weight: ${fontWeight};
+                        font-size: 14px;
+                        ${glow}
+                    '>
+                        ${row[col] || ''}
+                    </td>
+                `;
             } else {
-                html += `<td style='border:1px solid var(--border-color-primary, #ddd); padding:8px; color: var(--body-text-color, #333);'>`;
+                html += `
+                    <td style='
+                        border: none; 
+                        padding: 16px; 
+                        color: var(--body-text-color, #1f2937);
+                        font-size: 14px;
+                        font-weight: 450;
+                    '>
+                `;
                 
                 if (col.includes('Accuracy')) {
                     const value = parseFloat(row[col]);
                     if (isNaN(value)) {
-                        html += "0.0%";
+                        html += "<span style='color: var(--error-color, #EF4444); font-weight: 500;'>0.0%</span>";
                     } else {
-                        html += `${value.toFixed(1)}%`;
+                        // Enhanced color coding with gradients for accuracy values
+                        let accuracyColor = 'var(--body-text-color, #1f2937)';
+                        let bgGradient = '';
+                        if (value >= 95) {
+                            accuracyColor = 'var(--success-color, #059669)';
+                            bgGradient = 'background: linear-gradient(90deg, rgba(16, 185, 129, 0.1) 0%, transparent 100%);';
+                        } else if (value >= 85) {
+                            accuracyColor = 'var(--success-light, #10B981)';
+                            bgGradient = 'background: linear-gradient(90deg, rgba(16, 185, 129, 0.05) 0%, transparent 100%);';
+                        } else if (value >= 70) {
+                            accuracyColor = 'var(--warning-color, #D97706)';
+                        } else if (value < 50) {
+                            accuracyColor = 'var(--error-color, #DC2626)';
+                        }
+                        
+                        html += `<span style='color: ${accuracyColor}; font-weight: 600; ${bgGradient} padding: 2px 6px; border-radius: 4px;'>${value.toFixed(1)}%</span>`;
                     }
+                } else if (col === 'Rank') {
+                    // Enhanced rank styling with better visual hierarchy
+                    const rank = parseInt(row[col]);
+                    let rankStyle = 'color: var(--body-text-color, #1f2937); font-weight: 600;';
+                    
+                    if (rank === 1) {
+                        rankStyle = 'color: #FFD700; font-weight: 700; text-shadow: 0 0 8px rgba(255, 215, 0, 0.4); background: linear-gradient(90deg, rgba(255, 215, 0, 0.1) 0%, transparent 100%); padding: 4px 8px; border-radius: 6px;';
+                    } else if (rank === 2) {
+                        rankStyle = 'color: #C0C0C0; font-weight: 700; text-shadow: 0 0 6px rgba(192, 192, 192, 0.3); background: linear-gradient(90deg, rgba(192, 192, 192, 0.1) 0%, transparent 100%); padding: 4px 8px; border-radius: 6px;';
+                    } else if (rank === 3) {
+                        rankStyle = 'color: #CD7F32; font-weight: 700; text-shadow: 0 0 6px rgba(205, 127, 50, 0.3); background: linear-gradient(90deg, rgba(205, 127, 50, 0.1) 0%, transparent 100%); padding: 4px 8px; border-radius: 6px;';
+                    }
+                    
+                    html += `<span style='${rankStyle}'>${row[col] || ''}</span>`;
                 } else {
-                    html += row[col] || '';
+                    html += `<span style='font-weight: 500;'>${row[col] || ''}</span>`;
                 }
                 
                 html += "</td>";
@@ -575,7 +690,19 @@ function updateTable() {
         tableContainer.innerHTML = htmlTable;
     } catch (error) {
         console.error('Error updating table:', error);
-        tableContainer.innerHTML = '<div class="error-message">Error generating table</div>';
+        tableContainer.innerHTML = `
+            <div style="
+                color: var(--error-color, #EF4444); 
+                padding: 20px; 
+                text-align: center; 
+                background: var(--background-fill-primary, rgba(255,255,255,0.05));
+                border: 1px solid var(--error-color, #EF4444); 
+                border-radius: 12px;
+                backdrop-filter: blur(10px);
+            ">
+                Error generating table: ${error.message}
+            </div>
+        `;
     }
 }
 
@@ -583,7 +710,19 @@ function createWeightAccuracyPlot() {
     const container = document.getElementById('weight-accuracy-plot');
     
     if (!container || !evaluationData) {
-        if (container) container.innerHTML = '<div class="no-data-message">No data available for weight analysis</div>';
+        if (container) container.innerHTML = `
+            <div style="
+                padding: 20px; 
+                text-align: center; 
+                color: var(--body-text-color, #666);
+                background: var(--background-fill-primary, rgba(255,255,255,0.05));
+                border-radius: 12px;
+                border: 1px solid var(--border-color-primary, rgba(255,255,255,0.1));
+                backdrop-filter: blur(10px);
+            ">
+                No data available for weight analysis
+            </div>
+        `;
         return;
     }
     
@@ -594,7 +733,19 @@ function createWeightAccuracyPlot() {
         );
         
         if (!allSpecialtiesGeneral) {
-            container.innerHTML = '<div class="no-data-message">No All Specialties data available</div>';
+            container.innerHTML = `
+                <div style="
+                    padding: 20px; 
+                    text-align: center; 
+                    color: var(--body-text-color, #666);
+                    background: var(--background-fill-primary, rgba(255,255,255,0.05));
+                    border-radius: 12px;
+                    border: 1px solid var(--border-color-primary, rgba(255,255,255,0.1));
+                    backdrop-filter: blur(10px);
+                ">
+                    No All Specialties data available
+                </div>
+            `;
             return;
         }
         
@@ -629,7 +780,19 @@ function createWeightAccuracyPlot() {
         });
         
         if (weightData.length === 0) {
-            container.innerHTML = '<div class="no-data-message">No models with valid weight parameters found</div>';
+            container.innerHTML = `
+                <div style="
+                    padding: 20px; 
+                    text-align: center; 
+                    color: var(--body-text-color, #666);
+                    background: var(--background-fill-primary, rgba(255,255,255,0.05));
+                    border-radius: 12px;
+                    border: 1px solid var(--border-color-primary, rgba(255,255,255,0.1));
+                    backdrop-filter: blur(10px);
+                ">
+                    No models with valid weight parameters found
+                </div>
+            `;
             return;
         }
         
@@ -669,7 +832,9 @@ function createWeightAccuracyPlot() {
                 range: [0, Math.max(100, Math.max(...weightData.map(d => d.accuracy)) + 10)]
             },
             height: 600,
-            hovermode: 'closest'
+            hovermode: 'closest',
+            paper_bgcolor: 'rgba(0,0,0,0)',
+            plot_bgcolor: 'rgba(0,0,0,0)'
         };
         
         container.innerHTML = '';
@@ -677,164 +842,327 @@ function createWeightAccuracyPlot() {
         
     } catch (error) {
         console.error('Error creating weight accuracy plot:', error);
-        container.innerHTML = '<div class="error-message">Error creating weight analysis plot</div>';
+        container.innerHTML = `
+            <div style="
+                padding: 20px; 
+                text-align: center; 
+                color: var(--error-color, #EF4444);
+                background: var(--background-fill-primary, rgba(255,255,255,0.05));
+                border: 1px solid var(--error-color, #EF4444);
+                border-radius: 12px;
+                backdrop-filter: blur(10px);
+            ">
+                Error creating weight analysis plot: ${error.message}
+            </div>
+        `;
     }
 }
 
 function createModelSimilarityNetwork() {
     const container = document.getElementById('similarity-network');
+    const percentileInput = document.getElementById('network-percentile');
     
     if (!container || !evaluationData) {
-        if (container) container.innerHTML = '<div class="no-data-message">No data available for network analysis</div>';
+        if (container) container.innerHTML = `
+            <div style="
+                padding: 20px; 
+                text-align: center; 
+                color: var(--body-text-color, #666);
+                background: var(--background-fill-primary, rgba(255,255,255,0.05));
+                border-radius: 12px;
+                border: 1px solid var(--border-color-primary, rgba(255,255,255,0.1));
+                backdrop-filter: blur(10px);
+            ">
+                No data available for network analysis
+            </div>
+        `;
         return;
     }
     
     try {
         // Check if vis.js is loaded
         if (typeof vis === 'undefined') {
-            container.innerHTML = '<div class="no-data-message">Network visualization library not loaded</div>';
+            container.innerHTML = `
+                <div style="
+                    padding: 20px; 
+                    text-align: center; 
+                    color: var(--body-text-color, #666);
+                    background: var(--background-fill-primary, rgba(255,255,255,0.05));
+                    border-radius: 12px;
+                    border: 1px solid var(--border-color-primary, rgba(255,255,255,0.1));
+                    backdrop-filter: blur(10px);
+                ">
+                    Network visualization library not loaded
+                </div>
+            `;
             return;
         }
         
-        // Get all specialties data for each model
+        // Get percentile threshold from input (default 1%)
+        const percentile = percentileInput ? parseFloat(percentileInput.value) || 1 : 1;
+        
+        // Get All Specialties General Accuracy data to determine top models
+        const allSpecialtiesGeneral = evaluationData.find(row => 
+            row.Specialty === "All Specialties" && row["Score Type"] === "General"
+        );
+        
+        if (!allSpecialtiesGeneral) {
+            container.innerHTML = `
+                <div style="
+                    padding: 20px; 
+                    text-align: center; 
+                    color: var(--body-text-color, #666);
+                    background: var(--background-fill-primary, rgba(255,255,255,0.05));
+                    border-radius: 12px;
+                    border: 1px solid var(--border-color-primary, rgba(255,255,255,0.1));
+                    backdrop-filter: blur(10px);
+                ">
+                    No All Specialties data available for network analysis
+                </div>
+            `;
+            return;
+        }
+        
+        // Get model accuracies and sort by accuracy
+        const modelAccuracies = modelColumns.map(modelCol => ({
+            column: modelCol,
+            name: modelMapping[modelCol] || modelCol,
+            accuracy: parseFloat(allSpecialtiesGeneral[modelCol]) || 0
+        })).sort((a, b) => b.accuracy - a.accuracy);
+        
+        // Select top percentile models
+        const topModelCount = Math.max(1, Math.ceil(modelAccuracies.length * (percentile / 100)));
+        const topModels = modelAccuracies.slice(0, topModelCount);
+        
+        console.log(`Showing top ${percentile}% (${topModelCount}) models for network analysis`);
+        
+        // Get all specialties (excluding All Specialties for network)
         const specialties = [...new Set(evaluationData.map(row => row.Specialty))].filter(s => s !== "All Specialties");
         
         if (specialties.length === 0) {
-            container.innerHTML = '<div class="no-data-message">No specialty data available for network analysis</div>';
+            container.innerHTML = `
+                <div style="
+                    padding: 20px; 
+                    text-align: center; 
+                    color: var(--body-text-color, #666);
+                    background: var(--background-fill-primary, rgba(255,255,255,0.05));
+                    border-radius: 12px;
+                    border: 1px solid var(--border-color-primary, rgba(255,255,255,0.1));
+                    backdrop-filter: blur(10px);
+                ">
+                    No specialty data available for network analysis
+                </div>
+            `;
             return;
         }
         
-        const modelPerformanceData = {};
+        // Prepare nodes: specialties (large red circles) and models (smaller circles)
+        const nodes = [];
+        const edges = [];
+        let nodeId = 0;
         
-        modelColumns.forEach(modelCol => {
-            const cleanName = modelMapping[modelCol] || modelCol;
-            const finalName = replaceUnderscoresWithSpaces(
-                applyCharacterReplacements(
-                    applyExtension(cleanName)
-                )
-            );
+        // Add specialty nodes (large red circles)
+        const specialtyNodes = {};
+        specialties.forEach(specialty => {
+            const specialtyId = nodeId++;
+            specialtyNodes[specialty] = specialtyId;
+            nodes.push({
+                id: specialtyId,
+                label: specialty,
+                group: 'specialty',
+                color: {
+                    background: '#DC2626',
+                    border: '#B91C1C',
+                    highlight: {
+                        background: '#EF4444',
+                        border: '#DC2626'
+                    }
+                },
+                size: 40,
+                font: {
+                    color: '#ffffff',
+                    size: 16,
+                    face: 'Arial',
+                    bold: true
+                },
+                physics: {
+                    repulsion: {
+                        nodeDistance: 300,
+                        centralGravity: 0.1,
+                        springLength: 200,
+                        springConstant: 0.05
+                    }
+                }
+            });
+        });
+        
+        // Add model nodes and connect to specialties based on performance
+        topModels.forEach(model => {
+            const modelId = nodeId++;
+            const extracted = extractParameterSize(model.name);
+            const cleanModelName = extracted.cleanedName || model.name;
             
-            const extracted = extractParameterSize(finalName);
-            const modelKey = extracted.cleanedName || modelCol;
+            nodes.push({
+                id: modelId,
+                label: cleanModelName,
+                group: 'model',
+                color: {
+                    background: '#4ECDC4',
+                    border: '#45B7AA',
+                    highlight: {
+                        background: '#5FDDD6',
+                        border: '#4ECDC4'
+                    }
+                },
+                size: 20 + (model.accuracy / 100) * 15, // Size based on accuracy
+                font: {
+                    color: '#ffffff',
+                    size: 12,
+                    face: 'Arial'
+                },
+                title: `${cleanModelName}<br>Overall Accuracy: ${model.accuracy.toFixed(1)}%`
+            });
             
-            modelPerformanceData[modelKey] = {};
-            
+            // Connect model to specialties based on performance
             specialties.forEach(specialty => {
                 const generalRow = evaluationData.find(row => 
                     row.Specialty === specialty && row["Score Type"] === "General"
                 );
-                const accuracy = generalRow ? (parseFloat(generalRow[modelCol]) || 0) : 0;
-                modelPerformanceData[modelKey][specialty] = accuracy;
+                
+                if (generalRow) {
+                    const specialtyAccuracy = parseFloat(generalRow[model.column]) || 0;
+                    
+                    // Connect if model has good performance in this specialty (>50%)
+                    if (specialtyAccuracy > 50) {
+                        const connectionStrength = specialtyAccuracy / 100;
+                        edges.push({
+                            from: modelId,
+                            to: specialtyNodes[specialty],
+                            value: connectionStrength,
+                            color: {
+                                color: `rgba(78, 205, 196, ${connectionStrength * 0.8})`,
+                                highlight: '#FF6B6B'
+                            },
+                            width: 1 + connectionStrength * 3,
+                            title: `${cleanModelName} → ${specialty}: ${specialtyAccuracy.toFixed(1)}%`,
+                            length: 150 - connectionStrength * 50 // Shorter edges for stronger connections
+                        });
+                    }
+                }
             });
         });
         
-        // Calculate similarity between models
-        const models = Object.keys(modelPerformanceData);
-        if (models.length < 2) {
-            container.innerHTML = '<div class="no-data-message">Not enough models for network analysis</div>';
-            return;
-        }
-        
-        const nodes = models.map((model, index) => ({
-            id: index,
-            label: model,
-            color: {
-                background: '#4ECDC4',
-                border: '#45B7AA',
-                highlight: {
-                    background: '#FF6B6B',
-                    border: '#FF5252'
-                }
-            }
-        }));
-        
-        const edges = [];
-        const threshold = 0.8; // Similarity threshold
-        
-        for (let i = 0; i < models.length; i++) {
-            for (let j = i + 1; j < models.length; j++) {
-                const model1 = models[i];
-                const model2 = models[j];
-                
-                // Calculate correlation coefficient
-                const values1 = specialties.map(s => modelPerformanceData[model1][s] || 0);
-                const values2 = specialties.map(s => modelPerformanceData[model2][s] || 0);
-                
-                const correlation = calculateCorrelation(values1, values2);
-                
-                if (correlation > threshold) {
-                    edges.push({
-                        from: i,
-                        to: j,
-                        value: correlation,
-                        label: `${(correlation * 100).toFixed(1)}%`,
-                        color: {
-                            color: `rgba(78, 205, 196, ${correlation})`,
-                            highlight: '#FF6B6B'
-                        }
-                    });
-                }
-            }
-        }
-        
         const data = { nodes, edges };
         const options = {
-            nodes: {
-                shape: 'dot',
-                size: 20,
-                font: {
-                    size: 14,
-                    color: '#333'
+            groups: {
+                specialty: {
+                    shape: 'dot',
+                    size: 40,
+                    font: { size: 16, color: '#ffffff' }
                 },
-                borderWidth: 2
-            },
-            edges: {
-                width: 2,
-                smooth: {
-                    type: 'continuous'
+                model: {
+                    shape: 'dot',
+                    size: 25,
+                    font: { size: 12, color: '#ffffff' }
                 }
             },
             physics: {
-                stabilization: false,
+                enabled: true,
+                stabilization: { iterations: 100 },
                 barnesHut: {
-                    gravitationalConstant: -8000,
-                    springConstant: 0.001,
-                    springLength: 200
-                }
+                    gravitationalConstant: -15000,
+                    centralGravity: 0.3,
+                    springLength: 200,
+                    springConstant: 0.04,
+                    damping: 0.09,
+                    avoidOverlap: 0.1
+                },
+                maxVelocity: 50,
+                minVelocity: 0.1,
+                timestep: 0.35
             },
             interaction: {
                 hover: true,
-                tooltipDelay: 300
+                tooltipDelay: 200,
+                selectConnectedEdges: false
+            },
+            layout: {
+                improvedLayout: true,
+                clusterThreshold: 150
             }
         };
         
-        container.innerHTML = '<div id="network-vis" style="width: 100%; height: 500px;"></div>';
-        const network = new vis.Network(document.getElementById('network-vis'), data, options);
-        
-        // Add legend
-        const legend = document.createElement('div');
-        legend.className = 'network-legend';
-        legend.innerHTML = `
-            <div class="legend-item">
-                <div class="legend-color" style="background-color: #4ECDC4;"></div>
-                <span>Models</span>
-            </div>
-            <div class="legend-item">
-                <div class="legend-line"></div>
-                <span>Similarity > 80%</span>
-            </div>
-            <div class="legend-item">
-                <span>Total Models: ${models.length}</span>
-            </div>
-            <div class="legend-item">
-                <span>Connections: ${edges.length}</span>
+        container.innerHTML = `
+            <div style="
+                background: var(--background-fill-primary, rgba(255,255,255,0.05));
+                border-radius: 12px;
+                border: 1px solid var(--border-color-primary, rgba(255,255,255,0.1));
+                backdrop-filter: blur(10px);
+                position: relative;
+                overflow: hidden;
+            ">
+                <div id="network-vis" style="width: 100%; height: 600px;"></div>
             </div>
         `;
-        container.appendChild(legend);
+        
+        const network = new vis.Network(document.getElementById('network-vis'), data, options);
+        
+        // Add legend with enhanced styling
+        const legend = document.createElement('div');
+        legend.className = 'network-legend';
+        legend.style.cssText = `
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: var(--background-fill-primary, rgba(255,255,255,0.9));
+            backdrop-filter: blur(20px);
+            padding: 16px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color-primary, rgba(255,255,255,0.2));
+            font-size: 12px;
+            color: var(--body-text-color, #1f2937);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            z-index: 1000;
+        `;
+        
+        legend.innerHTML = `
+            <div style="margin-bottom: 12px; font-weight: 600; color: var(--body-text-color, #1f2937);">Network Legend</div>
+            <div style="display: flex; align-items: center; margin-bottom: 8px;">
+                <div style="width: 20px; height: 20px; background-color: #DC2626; border-radius: 50%; margin-right: 8px; border: 2px solid #B91C1C;"></div>
+                <span>Medical Specialties</span>
+            </div>
+            <div style="display: flex; align-items: center; margin-bottom: 8px;">
+                <div style="width: 16px; height: 16px; background-color: #4ECDC4; border-radius: 50%; margin-right: 8px; border: 2px solid #45B7AA;"></div>
+                <span>Top ${percentile}% Models</span>
+            </div>
+            <div style="display: flex; align-items: center; margin-bottom: 8px;">
+                <div style="width: 24px; height: 2px; background: linear-gradient(90deg, rgba(78, 205, 196, 0.3), rgba(78, 205, 196, 0.9)); margin-right: 8px;"></div>
+                <span>Performance Links</span>
+            </div>
+            <div style="margin-top: 12px; padding-top: 8px; border-top: 1px solid var(--border-color-primary, rgba(255,255,255,0.2)); font-size: 11px; color: var(--body-text-color-secondary, #6b7280);">
+                <div>Models: ${topModels.length}</div>
+                <div>Specialties: ${specialties.length}</div>
+                <div>Connections: ${edges.length}</div>
+            </div>
+        `;
+        
+        container.firstChild.appendChild(legend);
         
     } catch (error) {
         console.error('Error creating similarity network:', error);
-        container.innerHTML = '<div class="error-message">Error creating model similarity network</div>';
+        container.innerHTML = `
+            <div style="
+                padding: 20px; 
+                text-align: center; 
+                color: var(--error-color, #EF4444);
+                background: var(--background-fill-primary, rgba(255,255,255,0.05));
+                border: 1px solid var(--error-color, #EF4444);
+                border-radius: 12px;
+                backdrop-filter: blur(10px);
+            ">
+                Error creating model similarity network: ${error.message}
+            </div>
+        `;
     }
 }
 
@@ -880,11 +1208,24 @@ function calculateCorrelation(x, y) {
 }
 
 function showError(message) {
-    const errorHtml = `<div class="error-message" style="color: #ff4444; padding: 20px; text-align: center; border: 1px solid #ff4444; border-radius: 5px; margin: 20px 0;">${message}</div>`;
+    const errorHtml = `
+        <div style="
+            color: var(--error-color, #EF4444); 
+            padding: 20px; 
+            text-align: center; 
+            background: var(--background-fill-primary, rgba(255,255,255,0.05));
+            border: 1px solid var(--error-color, #EF4444); 
+            border-radius: 12px; 
+            margin: 20px 0;
+            backdrop-filter: blur(10px);
+        ">
+            ${message}
+        </div>
+    `;
     
     const containers = [
         'leaderboard-table',
-        'weight-accuracy-plot', 
+        'weight-accuracy-plot',
         'similarity-network'
     ];
     
