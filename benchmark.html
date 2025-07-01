@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DEEPCALL | Medical LLM Benchmark Suite</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@300;400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="grid-background"></div>
+    
+    <header>
+        <div class="logo-container">
+            <div class="logo">
+                <div class="logo-icon">
+                    <div class="node"></div>
+                    <div class="node"></div>
+                    <div class="node"></div>
+                    <div class="curve"></div>
+                </div>
+                <div class="logo-text">DEEPCALL</div>
+            </div>
+        </div>
+        
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="benchmark.html" class="active">Benchmark</a></li>
+                <li><a href="mission.html">Mission</a></li>
+                <li><a href="contact.html">Contact</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <!-- Hero Section -->
+        <section class="benchmark-hero">
+            <div class="glass-panel wide">
+                <h1>Medical LLM <span class="highlight">Benchmark Suite</span></h1>
+                <p class="subtitle">Comprehensive Evaluation Framework for Medical AI Models</p>
+                <p class="version-info">Private evaluation system designed to assess medical language models across performance, specialties, and fairness dimensions</p>
+                
+                <!-- General disclaimer -->
+                <div class="disclaimer-alert">
+                    <h3>⚠️ IMPORTANT NOTICE ⚠️</h3>
+                    <p><strong>This is a private research evaluation for experimental purposes only.</strong></p>
+                    <p>These benchmarks are designed to evaluate AI model capabilities in controlled test scenarios. <strong>No model evaluated here should be used for actual medical advice, diagnosis, or treatment decisions.</strong> Always consult qualified medical professionals for healthcare needs.</p>
+                    
+                    <p><strong>Research Purpose:</strong> These evaluations aim to advance understanding of AI capabilities and limitations in medical contexts, promote healthcare equity, and support development of safer AI systems.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Benchmark Categories -->
+        <section class="benchmark-categories">
+            <div class="categories-container">
+                
+                <!-- Medical Specialties Evaluation Box -->
+                <div class="benchmark-card">
+                    <div class="glass-panel">
+                        <div class="card-header">
+                            <div class="card-icon">🏥</div>
+                            <h2>Medical Specialties <span class="highlight">Evaluation</span></h2>
+                        </div>
+                        
+                        <div class="card-content">
+                            <p class="card-description">
+                                Comprehensive assessment of small LLMs (under 13B parameters) across 1400 medical questions spanning multiple specialties and clinical scenarios.
+                            </p>
+                            
+                            <div class="features-list">
+                                <h3>Key Features:</h3>
+                                <ul>
+                                    <li><strong>Specialty Coverage:</strong> Extensive evaluation across medical specialties</li>
+                                    <li><strong>Question Categories:</strong> Knowledge, action, emergency, diagnostic, disease identification, and real-life scenarios</li>
+                                    <li><strong>Performance Analytics:</strong> Model weight vs accuracy analysis and similarity networks</li>
+                                    <li><strong>Clinical Focus:</strong> Stress-testing models on life-threatening situations</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="evaluation-details">
+                                <p><strong>Evaluation Scope:</strong> 1400 questions manually graded by Dr. Yohann Missiak MD</p>
+                                <p><strong>Target Models:</strong> Small portable LLMs suitable for local deployment</p>
+                                <p><strong>Research Goal:</strong> Understanding reasoning patterns and domain-specific capabilities</p>
+                            </div>
+                        </div>
+                        
+                        <div class="card-footer">
+                            <a href="benchmark_specialties.html" class="neon-button primary">
+                                🔬 Explore Specialties Evaluation
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bias Analysis Box -->
+                <div class="benchmark-card">
+                    <div class="glass-panel">
+                        <div class="card-header">
+                            <div class="card-icon">⚖️</div>
+                            <h2>Bias & Fairness <span class="highlight">Analysis</span></h2>
+                        </div>
+                        
+                        <div class="card-content">
+                            <p class="card-description">
+                                Advanced discrimination assessment framework designed to identify bias patterns in medical AI systems that could impact marginalized communities.
+                            </p>
+                            
+                            <div class="features-list">
+                                <h3>Key Features:</h3>
+                                <ul>
+                                    <li><strong>Discrimination Detection:</strong> Systematic identification of bias patterns</li>
+                                    <li><strong>Multi-dimensional Analysis:</strong> Gender, ethnicity, and intersectional bias assessment</li>
+                                    <li><strong>Fairness Metrics:</strong> Comprehensive scoring system for equity evaluation</li>
+                                    <li><strong>Healthcare Equity Focus:</strong> Protecting minority and marginalized groups</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="evaluation-details">
+                                <p><strong>Research Objective:</strong> Advancing inclusive AI development in medical applications</p>
+                                <p><strong>Compliance Focus:</strong> Supporting AI Act EU requirements and healthcare standards</p>
+                                <p><strong>Impact Assessment:</strong> Preventing discriminatory healthcare AI deployment</p>
+                            </div>
+                        </div>
+                        
+                        <div class="card-footer">
+                            <a href="benchmark_fairness.html" class="neon-button secondary">
+                                📊 Explore Bias Analysis
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+        </section>
+
+        <!-- Research Overview -->
+        <section class="research-overview">
+            <div class="glass-panel">
+                <h2>📋 Research <span class="highlight">Overview</span></h2>
+                <div class="overview-content">
+                    <p>The DEEPCALL Medical LLM Benchmark Suite represents a comprehensive evaluation framework designed to assess the capabilities, limitations, and ethical implications of medical AI systems. This private research initiative combines rigorous technical evaluation with critical bias assessment to advance the development of safer, more equitable medical AI.</p>
+                    
+                    <div class="research-pillars">
+                        <div class="pillar">
+                            <h3>🎯 Performance Assessment</h3>
+                            <p>Evaluating model accuracy across diverse medical scenarios and specialties to understand domain-specific capabilities and reasoning patterns.</p>
+                        </div>
+                        
+                        <div class="pillar">
+                            <h3>🛡️ Safety & Ethics</h3>
+                            <p>Identifying potential sources of bias and discrimination that could lead to healthcare disparities or misdiagnosis in vulnerable populations.</p>
+                        </div>
+                        
+                        <div class="pillar">
+                            <h3>🔬 Research Innovation</h3>
+                            <p>Contributing to the scientific understanding of AI behavior in medical contexts while promoting transparency and accountability in AI development.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="privacy-focus">
+                        <h3>🔒 Privacy & Compliance</h3>
+                        <p>Given GDPR and HIPAA requirements, this research focuses on small, locally-deployable models that can respect patient privacy and data consent requirements while maintaining clinical utility.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Important Notes -->
+        <section class="important-notes">
+            <div class="glass-panel">
+                <h2>📝 Important <span class="highlight">Notes</span></h2>
+                <div class="notes-content">
+                    <div class="note-item">
+                        <h3>🔬 Research Purpose Only</h3>
+                        <p>All evaluations are conducted strictly for research, educational, and compliance assessment purposes. Results are shared to advance scientific understanding and promote safer AI development.</p>
+                    </div>
+                    
+                    <div class="note-item">
+                        <h3>⚕️ Medical Disclaimer</h3>
+                        <p>No AI model, regardless of evaluation score, should be used for clinical decision-making, diagnosis, or treatment recommendations. Always consult qualified medical professionals.</p>
+                    </div>
+                    
+                    <div class="note-item">
+                        <h3>📊 Evaluation Limitations</h3>
+                        <p>These assessments represent performance on specific test scenarios and should not be considered comprehensive validation for clinical use. Results require careful interpretation within research context.</p>
+                    </div>
+                    
+                    <div class="note-item">
+                        <h3>🎯 Continuous Development</h3>
+                        <p>This evaluation framework is continuously evolving to address emerging challenges in medical AI assessment, bias detection, and safety evaluation.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-logo">DEEPCALL</div>
+            <div class="footer-links">
+                <a href="index.html">Home</a>
+                <a href="benchmark.html">Benchmark</a>
+                <a href="mission.html">Mission</a>
+                <a href="contact.html">Contact</a>
+            </div>
+            <div class="footer-legal">
+                <p>© 2025 DEEPCALL Technology | Dr. Yohann Missiak</p>
+                <p>Private Research Evaluation - For Academic and Research Purposes Only</p>
+            </div>
+        </div>
+    </footer>
+
+    <style>
+        .benchmark-categories {
+            padding: 2rem 0;
+        }
+
+        .categories-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        .benchmark-card {
+            height: 100%;
+        }
+
+        .benchmark-card .glass-panel {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            padding: 2rem;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-icon {
+            font-size: 2.5rem;
+            filter: drop-shadow(0 0 10px rgba(0, 255, 255, 0.5));
+        }
+
+        .card-header h2 {
+            margin: 0;
+            font-size: 1.5rem;
+        }
+
+        .card-content {
+            flex: 1;
+            margin-bottom: 2rem;
+        }
+
+        .card-description {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+            color: #e0e0e0;
+        }
+
+        .features-list h3 {
+            color: #00ffff;
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+        }
+
+        .features-list ul {
+            list-style: none;
+            padding: 0;
+            margin-bottom: 1.5rem;
+        }
+
+        .features-list li {
+            padding: 0.5rem 0;
+            border-left: 3px solid #00ffff;
+            padding-left: 1rem;
+            margin-bottom: 0.5rem;
+            background: rgba(0, 255, 255, 0.05);
+        }
+
+        .evaluation-details {
+            background: rgba(0, 255, 255, 0.1);
+            padding: 1rem;
+            border-radius: 8px;
+            border: 1px solid rgba(0, 255, 255, 0.3);
+        }
+
+        .evaluation-details p {
+            margin: 0.5rem 0;
+            font-size: 0.95rem;
+        }
+
+        .card-footer {
+            text-align: center;
+        }
+
+        .neon-button.primary {
+            background: linear-gradient(135deg, #00ffff, #0080ff);
+        }
+
+        .neon-button.secondary {
+            background: linear-gradient(135deg, #ff6b35, #ff9500);
+        }
+
+        .research-pillars {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .pillar {
+            background: rgba(0, 255, 255, 0.05);
+            padding: 1.5rem;
+            border-radius: 10px;
+            border: 1px solid rgba(0, 255, 255, 0.2);
+        }
+
+        .pillar h3 {
+            color: #00ffff;
+            margin-bottom: 1rem;
+        }
+
+        .privacy-focus {
+            background: rgba(255, 255, 0, 0.05);
+            padding: 1.5rem;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 0, 0.2);
+            margin-top: 2rem;
+        }
+
+        .privacy-focus h3 {
+            color: #ffff00;
+            margin-bottom: 1rem;
+        }
+
+        .notes-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .note-item {
+            background: rgba(255, 255, 255, 0.02);
+            padding: 1.5rem;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .note-item h3 {
+            color: #00ffff;
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+
+        @media (max-width: 768px) {
+            .categories-container {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+            
+            .benchmark-card .glass-panel {
+                padding: 1.5rem;
+            }
+            
+            .card-header {
+                flex-direction: column;
+                text-align: center;
+                gap: 0.5rem;
+            }
+            
+            .research-pillars,
+            .notes-content {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+        }
+    </style>
+</body>
+</html>
