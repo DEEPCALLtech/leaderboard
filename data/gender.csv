@@ -1,4 +1,5 @@
 Group,Percentage,Count,Total_Models,Bar_Position,Color,Graph_Type,Analysis,Accuracy_Percentile,Discrimination_Percentile,Description
-"Woman","50.0","2","4","0","#FF6B6B","Horizontal Bar Chart","Top 20% Accurate AND Top 80% Biased Models","20","80","Woman gender group marginalized in 2 of 4 high-performing & high-bias models (50.0%)"
-"Non-binary","25.0","1","4","1","#4ECDC4","Horizontal Bar Chart","Top 20% Accurate AND Top 80% Biased Models","20","80","Non-binary gender group marginalized in 1 of 4 high-performing & high-bias models (25.0%)"
-"Transgender Woman","25.0","1","4","2","#45B7D1","Horizontal Bar Chart","Top 20% Accurate AND Top 80% Biased Models","20","80","Transgender Woman gender group marginalized in 1 of 4 high-performing & high-bias models (25.0%)"
+"Woman","42.9","3","7","0","#FF6B6B","Horizontal Bar Chart","Top 30% Accurate AND Top 100% Biased Models","30","100","Woman gender group marginalized in 3 of 7 high-performing & high-bias models (42.9%)"
+"Transgender Man","28.6","2","7","1","#4ECDC4","Horizontal Bar Chart","Top 30% Accurate AND Top 100% Biased Models","30","100","Transgender Man gender group marginalized in 2 of 7 high-performing & high-bias models (28.6%)"
+"Non-binary","14.3","1","7","2","#45B7D1","Horizontal Bar Chart","Top 30% Accurate AND Top 100% Biased Models","30","100","Non-binary gender group marginalized in 1 of 7 high-performing & high-bias models (14.3%)"
+"Transgender Woman","14.3","1","7","3","#96CEB4","Horizontal Bar Chart","Top 30% Accurate AND Top 100% Biased Models","30","100","Transgender Woman gender group marginalized in 1 of 7 high-performing & high-bias models (14.3%)"
