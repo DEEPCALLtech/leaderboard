@@ -9,6 +9,7 @@ let fairnessData = null;
 let performanceData = null;
 let ethnicityData = null;
 let genderData = null;
+let discriminationData = null;
 
 // Initialize the application
 document.addEventListener('DOMContentLoaded', function() {
@@ -27,12 +28,13 @@ function setupEventListeners() {
 async function loadData() {
     try {
         // Load CSV files (you'll need to host these on your GitHub)
-        const [results, fairness, performance, ethnicity, gender] = await Promise.all([
+        const [results, fairness, performance, ethnicity, gender, discrimination] = await Promise.all([
             loadCSV('data/model_eval_final.csv'),
             loadCSV('data/fairness_ranking.csv'),
             loadCSV('data/performance_ranking.csv'),
             loadCSV('data/ethnicity.csv'),
-            loadCSV('data/gender.csv')
+            loadCSV('data/gender.csv'),
+            loadCSV('data/discrimination.csv')
         ]);
         
         // Clean model names (remove -cpu)
@@ -59,6 +61,7 @@ async function loadData() {
         performanceData = performance;
         ethnicityData = ethnicity;
         genderData = gender;
+        discriminationData = discrimination;
         
         // Auto-run analysis on load
         runAnalysisWithLayoutFix();
@@ -262,20 +265,22 @@ function createFairnessRankingTable() {
     // Clear previous content
     document.getElementById('fairness-table').innerHTML = '';
     
-    // Merge fairness and performance data
-    const mergedData = fairnessData.map(fairnessRow => {
-        const performanceRow = performanceData.find(p => p.Model === fairnessRow.Model);
-        if (performanceRow) {
-            return {
-                model: fairnessRow.Model,
-                fairnessScore: Math.round(parseFloat(fairnessRow.Fairness_Score) * 10) / 10,
-                performanceScore: Math.round(parseFloat(performanceRow.Performance_Score) * 10) / 10,
-                fairnessRank: parseInt(fairnessRow.Rank),
-                performanceRank: parseInt(performanceRow.Rank)
-            };
-        }
-        return null;
-    }).filter(row => row !== null);
+    // Merge fairness and performance data, filtering out empty models
+    const mergedData = fairnessData
+        .filter(fairnessRow => fairnessRow.Model && fairnessRow.Model.trim() !== '') // Filter empty models
+        .map(fairnessRow => {
+            const performanceRow = performanceData.find(p => p.Model === fairnessRow.Model);
+            if (performanceRow) {
+                return {
+                    model: fairnessRow.Model,
+                    fairnessScore: Math.round(parseFloat(fairnessRow.Fairness_Score)),
+                    performanceScore: Math.round(parseFloat(performanceRow.Performance_Score)),
+                    fairnessRank: parseInt(fairnessRow.Rank),
+                    performanceRank: parseInt(performanceRow.Rank)
+                };
+            }
+            return null;
+        }).filter(row => row !== null);
     
     // Calculate performance threshold
     const performanceScores = mergedData.map(d => d.performanceScore);
@@ -298,7 +303,6 @@ function createFairnessRankingTable() {
     
     const finalData = [...topPerformers, ...others];
     
-    // Removed "Legal" column from the table columns
     displayTable('fairness-table', finalData, [
         { key: 'finalRank', header: 'Final Rank' },
         { key: 'model', header: 'Model' },
@@ -325,7 +329,7 @@ function createGenderRankingPlot(data) {
         .slice(0, 20);
     
     const trace = {
-        x: sortedData.map(row => parseFloat(row[genderColumn])),
+        x: sortedData.map(row => Math.round(parseFloat(row[genderColumn]))),
         y: sortedData.map(row => row['Model Name']),
         type: 'bar',
         orientation: 'h',
@@ -337,7 +341,7 @@ function createGenderRankingPlot(data) {
                 return `rgba(${red}, 0, ${blue}, 0.8)`;
             })
         },
-        text: sortedData.map(row => parseFloat(row[genderColumn]).toFixed(2)),
+        text: sortedData.map(row => Math.round(parseFloat(row[genderColumn]))),
         textposition: 'outside'
     };
     
@@ -366,7 +370,7 @@ function createEthnicityRankingPlot(data) {
         .slice(0, 20);
     
     const trace = {
-        x: sortedData.map(row => parseFloat(row[ethnicityColumn])),
+        x: sortedData.map(row => Math.round(parseFloat(row[ethnicityColumn]))),
         y: sortedData.map(row => row['Model Name']),
         type: 'bar',
         orientation: 'h',
@@ -378,7 +382,7 @@ function createEthnicityRankingPlot(data) {
                 return `rgba(${red}, 0, ${blue}, 0.8)`;
             })
         },
-        text: sortedData.map(row => parseFloat(row[ethnicityColumn]).toFixed(2)),
+        text: sortedData.map(row => Math.round(parseFloat(row[ethnicityColumn]))),
         textposition: 'outside'
     };
     
@@ -396,11 +400,11 @@ function analyzeDiscriminationPatterns(data) {
     // Clear previous content
     document.getElementById('discrimination-plots').innerHTML = '';
     
-    if (!ethnicityData || !genderData) {
+    if (!ethnicityData || !genderData || !discriminationData) {
         document.getElementById('discrimination-plots').innerHTML = `
             <div class="analysis-placeholder">
                 <p>Discrimination pattern data not available.</p>
-                <p>Please ensure ethnicity.csv and gender.csv files are loaded.</p>
+                <p>Please ensure ethnicity.csv, gender.csv, and discrimination.csv files are loaded.</p>
             </div>
         `;
         return;
@@ -452,26 +456,108 @@ function createDiscriminationPatternsVisualization() {
     createGenderPatternPlot();
 }
 
+function createCompleteGenderData() {
+    if (!discriminationData || !genderData) return [];
+    
+    // Get all unique genders from discrimination.csv
+    const allGenders = [...new Set(discriminationData.map(row => row.Gender).filter(gender => gender && gender.trim() !== ''))];
+    
+    // Create complete gender data
+    const completeGenderData = [];
+    
+    allGenders.forEach(gender => {
+        // Check if this gender exists in gender.csv
+        const existingGender = genderData.find(row => row.Group === gender);
+        
+        if (existingGender) {
+            // Use data from gender.csv
+            completeGenderData.push(existingGender);
+        } else {
+            // Create entry with 0% for missing genders
+            const totalModels = genderData[0]?.Total_Models || 6;
+            completeGenderData.push({
+                Group: gender,
+                Percentage: "0.0",
+                Count: "0",
+                Total_Models: totalModels,
+                Bar_Position: completeGenderData.length,
+                Color: "#D3D3D3", // Gray color for 0% groups
+                Graph_Type: "Horizontal Bar Chart",
+                Analysis: `Top ${Math.floor(TOP_PERCENTILE_ACCURACY * 100)}% Accurate AND Top ${Math.floor(TOP_PERCENTILE_DISCRIMINATION * 100)}% Biased Models`,
+                Accuracy_Percentile: "20",
+                Discrimination_Percentile: "40",
+                Description: `${gender} gender group marginalized in 0 of ${totalModels} high-performing & high-bias models (0.0%)`
+            });
+        }
+    });
+    
+    return completeGenderData;
+}
+
+function createCompleteEthnicityData() {
+    if (!discriminationData || !ethnicityData) return [];
+    
+    // Get all unique ethnicities from discrimination.csv
+    const allEthnicities = [...new Set(discriminationData.map(row => row.Ethnicity).filter(ethnicity => ethnicity && ethnicity.trim() !== ''))];
+    
+    // Create complete ethnicity data
+    const completeEthnicityData = [];
+    
+    allEthnicities.forEach(ethnicity => {
+        // Check if this ethnicity exists in ethnicity.csv
+        const existingEthnicity = ethnicityData.find(row => row.Group === ethnicity);
+        
+        if (existingEthnicity) {
+            // Use data from ethnicity.csv
+            completeEthnicityData.push(existingEthnicity);
+        } else {
+            // Create entry with 0% for missing ethnicities
+            const totalModels = ethnicityData[0]?.Total_Models || 6;
+            completeEthnicityData.push({
+                Group: ethnicity,
+                Percentage: "0.0",
+                Count: "0",
+                Total_Models: totalModels,
+                Bar_Position: completeEthnicityData.length,
+                Color: "#D3D3D3", // Gray color for 0% groups
+                Graph_Type: "Horizontal Bar Chart",
+                Analysis: `Top ${Math.floor(TOP_PERCENTILE_ACCURACY * 100)}% Accurate AND Top ${Math.floor(TOP_PERCENTILE_DISCRIMINATION * 100)}% Biased Models`,
+                Accuracy_Percentile: "20",
+                Discrimination_Percentile: "40",
+                Description: `${ethnicity} ethnicity group marginalized in 0 of ${totalModels} high-performing & high-bias models (0.0%)`
+            });
+        }
+    });
+    
+    return completeEthnicityData;
+}
+
 function createEthnicityPatternPlot() {
-    if (!ethnicityData || ethnicityData.length === 0) return;
+    if (!ethnicityData || ethnicityData.length === 0 || !discriminationData) return;
+    
+    // Get complete ethnicity data including 0% groups
+    const completeData = createCompleteEthnicityData();
+    
+    // Filter out rows with empty Group names
+    const filteredData = completeData.filter(row => row.Group && row.Group.trim() !== '');
     
     const trace = {
-        x: ethnicityData.map(row => parseFloat(row.Percentage)),
-        y: ethnicityData.map(row => row.Group),
+        y: filteredData.map(row => parseFloat(row.Percentage)),
+        x: filteredData.map(row => row.Group),
         type: 'bar',
-        orientation: 'h',
+        orientation: 'v',
         marker: {
-            color: ethnicityData.map(row => row.Color || '#FF6B6B'),
+            color: filteredData.map(row => row.Color || '#FF6B6B'),
             opacity: 0.8
         },
-        text: ethnicityData.map(row => `${row.Percentage}% (${row.Count}/${row.Total_Models})`),
+        text: filteredData.map(row => `${row.Percentage}% (${row.Count}/${row.Total_Models})`),
         textposition: 'outside',
-        hovertemplate: '<b>%{y}</b><br>' +
-                      'Marginalization Rate: %{x}%<br>' +
+        hovertemplate: '<b>%{x}</b><br>' +
+                      'Marginalization Rate: %{y}%<br>' +
                       'Count: %{customdata.count}/%{customdata.total}<br>' +
                       '%{customdata.description}<br>' +
                       '<extra></extra>',
-        customdata: ethnicityData.map(row => ({
+        customdata: filteredData.map(row => ({
             count: row.Count,
             total: row.Total_Models,
             description: row.Description
@@ -480,14 +566,14 @@ function createEthnicityPatternPlot() {
     
     const layout = {
         title: 'Ethnicity Group Marginalization in High-Performance, High-Bias Models',
-        xaxis: {
-            title: 'Percentage of Models Showing Bias (%)',
-            range: [0, Math.max(...ethnicityData.map(row => parseFloat(row.Percentage))) + 10]
-        },
         yaxis: {
+            title: 'Percentage of Models Showing Bias (%)',
+            range: [0, 100]
+        },
+        xaxis: {
             title: 'Ethnicity Groups'
         },
-        margin: { l: 100, r: 50, t: 80, b: 80 },
+        margin: { l: 80, r: 50, t: 80, b: 120 },
         height: 400
     };
     
@@ -495,25 +581,31 @@ function createEthnicityPatternPlot() {
 }
 
 function createGenderPatternPlot() {
-    if (!genderData || genderData.length === 0) return;
+    if (!genderData || genderData.length === 0 || !discriminationData) return;
+    
+    // Get complete gender data including 0% groups
+    const completeData = createCompleteGenderData();
+    
+    // Filter out rows with empty Group names
+    const filteredData = completeData.filter(row => row.Group && row.Group.trim() !== '');
     
     const trace = {
-        x: genderData.map(row => parseFloat(row.Percentage)),
-        y: genderData.map(row => row.Group),
+        y: filteredData.map(row => parseFloat(row.Percentage)),
+        x: filteredData.map(row => row.Group),
         type: 'bar',
-        orientation: 'h',
+        orientation: 'v',
         marker: {
-            color: genderData.map(row => row.Color || '#4ECDC4'),
+            color: filteredData.map(row => row.Color || '#4ECDC4'),
             opacity: 0.8
         },
-        text: genderData.map(row => `${row.Percentage}% (${row.Count}/${row.Total_Models})`),
+        text: filteredData.map(row => `${row.Percentage}% (${row.Count}/${row.Total_Models})`),
         textposition: 'outside',
-        hovertemplate: '<b>%{y}</b><br>' +
-                      'Marginalization Rate: %{x}%<br>' +
+        hovertemplate: '<b>%{x}</b><br>' +
+                      'Marginalization Rate: %{y}%<br>' +
                       'Count: %{customdata.count}/%{customdata.total}<br>' +
                       '%{customdata.description}<br>' +
                       '<extra></extra>',
-        customdata: genderData.map(row => ({
+        customdata: filteredData.map(row => ({
             count: row.Count,
             total: row.Total_Models,
             description: row.Description
@@ -522,14 +614,14 @@ function createGenderPatternPlot() {
     
     const layout = {
         title: 'Gender Group Marginalization in High-Performance, High-Bias Models',
-        xaxis: {
-            title: 'Percentage of Models Showing Bias (%)',
-            range: [0, Math.max(...genderData.map(row => parseFloat(row.Percentage))) + 10]
-        },
         yaxis: {
+            title: 'Percentage of Models Showing Bias (%)',
+            range: [0, 100]
+        },
+        xaxis: {
             title: 'Gender Groups'
         },
-        margin: { l: 120, r: 50, t: 80, b: 80 },
+        margin: { l: 80, r: 50, t: 80, b: 120 },
         height: 400
     };
     
@@ -539,191 +631,30 @@ function createGenderPatternPlot() {
 function getEthnicityInsights() {
     if (!ethnicityData || ethnicityData.length === 0) return "No data available";
     
-    const maxBias = ethnicityData.reduce((max, row) => 
+    const completeData = createCompleteEthnicityData();
+    
+    const maxBias = completeData.reduce((max, row) => 
         parseFloat(row.Percentage) > parseFloat(max.Percentage) ? row : max
     );
     
-    const minBias = ethnicityData.reduce((min, row) => 
+    const minBias = completeData.reduce((min, row) => 
         parseFloat(row.Percentage) < parseFloat(min.Percentage) ? row : min
     );
     
-    return `${maxBias.Group} shows highest bias rate (${maxBias.Percentage}%), while ${minBias.Group} shows lowest (${minBias.Percentage}%)`;
+    return `People in the group ${maxBias.Group} show highest bias rate (${maxBias.Percentage}%), while people in the group ${minBias.Group} show lowest (${minBias.Percentage}%)`;
 }
 
 function getGenderInsights() {
     if (!genderData || genderData.length === 0) return "No data available";
     
-    const maxBias = genderData.reduce((max, row) => 
+    const completeData = createCompleteGenderData();
+    
+    const maxBias = completeData.reduce((max, row) => 
         parseFloat(row.Percentage) > parseFloat(max.Percentage) ? row : max
     );
     
-    const minBias = genderData.reduce((min, row) => 
+    const minBias = completeData.reduce((min, row) => 
         parseFloat(row.Percentage) < parseFloat(min.Percentage) ? row : min
     );
     
-    return `${maxBias.Group} shows highest bias rate (${maxBias.Percentage}%), while ${minBias.Group} shows lowest (${minBias.Percentage}%)`;
-}
-
-function generateConclusion(data) {
-    // Clear previous content
-    document.getElementById('conclusion-section').innerHTML = '';
-    
-    const bestModel = findBestModel(data);
-    
-    let conclusion = `
-        <div class="conclusion-content">
-            <h3>🎯 Conclusion & Recommendation</h3>
-    `;
-    
-    if (bestModel) {
-        const accuracy = parseFloat(bestModel['Accuracy Global'].replace('%', ''));
-        conclusion += `
-            <p><strong>Recommended Model:</strong> <strong>${bestModel['Model Name']}</strong></p>
-            <ul>
-                <li><strong>Accuracy:</strong> ${accuracy.toFixed(1)}%</li>
-                <li><strong>Discrimination Score:</strong> ${parseFloat(bestModel['Discrimination Global Score']).toFixed(2)}</li>
-                <li><strong>Ranking:</strong> Among the least biased models (bottom 25% discrimination scores), this model achieves the highest accuracy.</li>
-            </ul>
-        `;
-    }
-    
-    conclusion += `
-            <h4>Analysis Summary:</h4>
-            <ul>
-                <li><strong>Total Models Analyzed:</strong> ${data.length}</li>
-                <li><strong>Top ${Math.floor(TOP_PERCENTILE_ACCURACY * 100)}% Most Accurate Models:</strong> ${Math.floor(data.length * TOP_PERCENTILE_ACCURACY)}</li>
-                <li><strong>Top ${Math.floor(TOP_PERCENTILE_DISCRIMINATION * 100)}% Most Biased Models:</strong> ${Math.floor(data.length * TOP_PERCENTILE_DISCRIMINATION)}</li>
-            </ul>
-            <p>This recommendation balances performance with fairness by selecting the most accurate model from among those with the lowest discrimination scores.</p>
-        </div>
-    `;
-    
-    document.getElementById('conclusion-section').innerHTML = conclusion;
-}
-
-function findBestModel(data) {
-    // Find models in bottom quartile of discrimination
-    const discriminationScores = data.map(row => parseFloat(row['Discrimination Global Score']));
-    const q1Threshold = calculatePercentile(discriminationScores, 25);
-    
-    const lowBiasModels = data.filter(row => 
-        parseFloat(row['Discrimination Global Score']) <= q1Threshold
-    );
-    
-    if (lowBiasModels.length === 0) return null;
-    
-    // Find highest accuracy among low bias models
-    return lowBiasModels.reduce((best, current) => {
-        const bestAccuracy = parseFloat(best['Accuracy Global'].replace('%', ''));
-        const currentAccuracy = parseFloat(current['Accuracy Global'].replace('%', ''));
-        return currentAccuracy > bestAccuracy ? current : best;
-    });
-}
-
-function displayResultsTable(data) {
-    // Clear previous content
-    document.getElementById('rankings-table').innerHTML = '';
-    
-    const columns = [
-        { key: 'Rank', header: 'Rank' },
-        { key: 'Model Name', header: 'Model Name' },
-        { key: 'Accuracy Global', header: 'Accuracy Global' },
-        { key: 'Discrimination Global Score', header: 'Discrimination Global Score' }
-    ];
-    
-    // Add any discrimination columns that exist, but exclude any with "Legal" or "legal"
-    const discriminationCols = Object.keys(data[0]).filter(key => 
-        key.includes('Discrimination') && 
-        key.includes('Score') && 
-        !key.includes('Global') &&
-        !key.toLowerCase().includes('legal')
-    );
-    
-    discriminationCols.forEach(col => {
-        columns.push({ key: col, header: col });
-    });
-    
-    displayTable('rankings-table', data, columns);
-}
-
-function displayTable(containerId, data, columns) {
-    let html = '<table class="results-table"><thead><tr>';
-    
-    columns.forEach(col => {
-        html += `<th>${col.header}</th>`;
-    });
-    html += '</tr></thead><tbody>';
-    
-    data.forEach(row => {
-        html += '<tr>';
-        columns.forEach(col => {
-            const value = row[col.key] || '';
-            html += `<td>${value}</td>`;
-        });
-        html += '</tr>';
-    });
-    
-    html += '</tbody></table>';
-    document.getElementById(containerId).innerHTML = html;
-}
-
-// Utility functions
-function findColumn(data, ...keywords) {
-    const columns = Object.keys(data[0] || {});
-    return columns.find(col => 
-        keywords.every(keyword => col.includes(keyword))
-    );
-}
-
-function calculatePercentile(values, percentile) {
-    const sorted = [...values].sort((a, b) => a - b);
-    const index = (percentile / 100) * (sorted.length - 1);
-    const lower = Math.floor(index);
-    const upper = Math.ceil(index);
-    const weight = index % 1;
-    
-    if (upper >= sorted.length) return sorted[sorted.length - 1];
-    return sorted[lower] * (1 - weight) + sorted[upper] * weight;
-}
-
-function showError(message) {
-    const errorHtml = `<div class="error-message">${message}</div>`;
-    document.getElementById('rankings-table').innerHTML = errorHtml;
-    document.getElementById('fairness-plot').innerHTML = errorHtml;
-    document.getElementById('fairness-table').innerHTML = errorHtml;
-    document.getElementById('gender-plot').innerHTML = errorHtml;
-    document.getElementById('ethnicity-plot').innerHTML = errorHtml;
-    document.getElementById('discrimination-plots').innerHTML = errorHtml;
-    document.getElementById('conclusion-section').innerHTML = errorHtml;
-}
-
-// Add this function to fix layout issues
-function fixLayoutIssues() {
-    // Force Plotly to resize
-    const plotIds = ['fairness-plot', 'gender-plot', 'ethnicity-plot', 'ethnicity-pattern-plot', 'gender-pattern-plot'];
-    plotIds.forEach(id => {
-        const element = document.getElementById(id);
-        if (element && element.firstChild) {
-            Plotly.Plots.resize(element);
-        }
-    });
-    
-    // Ensure proper spacing
-    const sections = document.querySelectorAll('.glass-panel');
-    sections.forEach((section, index) => {
-        section.style.marginBottom = '3rem';
-        section.style.position = 'relative';
-        section.style.zIndex = index + 1;
-    });
-}
-
-// Call this function after creating plots
-function runAnalysisWithLayoutFix() {
-    runAnalysis();
-    setTimeout(fixLayoutIssues, 500); // Give plots time to render
-}
-
-// Also call on window resize
-window.addEventListener('resize', () => {
-    setTimeout(fixLayoutIssues, 200);
-});
+    return `People in the group ${maxBias.Group} show highest bias rate (${maxBias.Percentage}%), while people in the group ${minBias.Group} show lowest (${minBias.
