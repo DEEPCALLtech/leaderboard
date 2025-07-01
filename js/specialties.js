@@ -160,13 +160,18 @@ function processCharacterReplacements(data) {
     if (data && data.length > 0) {
         try {
             data.forEach(row => {
-                const keys = Object.keys(row);
-                if (keys.length >= 2) {
-                    const original = row[keys[0]];
-                    const replacement = row[keys[1]];
-                    if (original && replacement && String(original).trim() !== '' && String(replacement).trim() !== '') {
-                        characterReplacements[String(original).trim().replace(/['"]/g, '')] = String(replacement).trim().replace(/['"]/g, '');
-                    }
+                // Handle both 'original' and first column approaches
+                const original = row.original || row[Object.keys(row)[0]];
+                const replacement = row.replacement || row[Object.keys(row)[1]];
+                
+                if (original && String(original).trim() !== '') {
+                    const cleanOriginal = String(original).trim().replace(/['"]/g, '');
+                    const cleanReplacement = replacement ? String(replacement).trim().replace(/['"]/g, '') : '';
+                    
+                    // Handle empty string replacements (for hiding text)
+                    characterReplacements[cleanOriginal] = cleanReplacement;
+                    
+                    console.log(`Character replacement: "${cleanOriginal}" -> "${cleanReplacement}"`);
                 }
             });
         } catch (error) {
@@ -411,9 +416,20 @@ function applyExtension(modelName) {
 function applyCharacterReplacements(modelName) {
     if (!modelName) return '';
     let result = String(modelName);
-    Object.keys(characterReplacements).forEach(original => {
-        result = result.replace(new RegExp(escapeRegExp(original), 'g'), characterReplacements[original]);
+    
+    // Sort replacements by length (longest first) to handle overlapping patterns correctly
+    const sortedReplacements = Object.entries(characterReplacements)
+        .sort(([a], [b]) => b.length - a.length);
+    
+    sortedReplacements.forEach(([original, replacement]) => {
+        // Use global replace to handle multiple occurrences
+        result = result.replace(new RegExp(escapeRegExp(original), 'g'), replacement);
     });
+    
+    // Clean up any multiple spaces that might result from replacements
+    result = result.replace(/\s+/g, ' ').trim();
+    
+    console.log(`Applied replacements: "${modelName}" -> "${result}"`);
     return result;
 }
 
@@ -727,11 +743,10 @@ function createWeightAccuracyPlot() {
             <div style="
                 padding: 20px; 
                 text-align: center; 
-                color: var(--body-text-color, #666);
-                background: var(--background-fill-primary, rgba(255,255,255,0.05));
+                color: #666;
+                background: white;
                 border-radius: 12px;
-                border: 1px solid var(--border-color-primary, rgba(255,255,255,0.1));
-                backdrop-filter: blur(10px);
+                border: 1px solid #ddd;
             ">
                 No data available for weight analysis
             </div>
@@ -750,11 +765,10 @@ function createWeightAccuracyPlot() {
                 <div style="
                     padding: 20px; 
                     text-align: center; 
-                    color: var(--body-text-color, #666);
-                    background: var(--background-fill-primary, rgba(255,255,255,0.05));
+                    color: #666;
+                    background: white;
                     border-radius: 12px;
-                    border: 1px solid var(--border-color-primary, rgba(255,255,255,0.1));
-                    backdrop-filter: blur(10px);
+                    border: 1px solid #ddd;
                 ">
                     No All Specialties data available
                 </div>
@@ -766,11 +780,11 @@ function createWeightAccuracyPlot() {
         
         modelColumns.forEach(modelCol => {
             const cleanName = modelMapping[modelCol] || modelCol;
-            const finalName = replaceUnderscoresWithSpaces(
-                applyCharacterReplacements(
-                    applyExtension(cleanName)
-                )
-            );
+            
+            // Apply all transformations including character replacements
+            const extendedModelName = applyExtension(cleanName);
+            const charReplacedModelName = applyCharacterReplacements(extendedModelName);
+            const finalName = replaceUnderscoresWithSpaces(charReplacedModelName);
             
             // Extract parameter size and check if it contains 'b'
             const extracted = extractParameterSize(finalName);
@@ -800,11 +814,10 @@ function createWeightAccuracyPlot() {
                 <div style="
                     padding: 20px; 
                     text-align: center; 
-                    color: var(--body-text-color, #666);
-                    background: var(--background-fill-primary, rgba(255,255,255,0.05));
+                    color: #666;
+                    background: white;
                     border-radius: 12px;
-                    border: 1px solid var(--border-color-primary, rgba(255,255,255,0.1));
-                    backdrop-filter: blur(10px);
+                    border: 1px solid #ddd;
                 ">
                     No models with valid weight parameters found
                 </div>
@@ -838,19 +851,26 @@ function createWeightAccuracyPlot() {
         };
         
         const layout = {
-            title: 'Model Weight vs General Accuracy (B-parameter models only)',
+            title: 'Model Weight vs Accuracy Analysis',
             xaxis: {
                 title: 'Model Weight (Billion Parameters)',
-                type: 'log'
+                type: 'log',
+                gridcolor: '#e5e5e5',
+                linecolor: '#666'
             },
             yaxis: {
                 title: 'General Accuracy (%)',
-                range: [0, Math.max(100, Math.max(...weightData.map(d => d.accuracy)) + 10)]
+                range: [0, Math.max(100, Math.max(...weightData.map(d => d.accuracy)) + 10)],
+                gridcolor: '#e5e5e5',
+                linecolor: '#666'
             },
             height: 600,
             hovermode: 'closest',
-            paper_bgcolor: 'rgba(0,0,0,0)',
-            plot_bgcolor: 'rgba(0,0,0,0)'
+            paper_bgcolor: 'white',
+            plot_bgcolor: 'white',
+            font: {
+                color: '#333'
+            }
         };
         
         container.innerHTML = '';
@@ -862,11 +882,10 @@ function createWeightAccuracyPlot() {
             <div style="
                 padding: 20px; 
                 text-align: center; 
-                color: var(--error-color, #EF4444);
-                background: var(--background-fill-primary, rgba(255,255,255,0.05));
-                border: 1px solid var(--error-color, #EF4444);
+                color: #EF4444;
+                background: white;
+                border: 1px solid #EF4444;
                 border-radius: 12px;
-                backdrop-filter: blur(10px);
             ">
                 Error creating weight analysis plot: ${error.message}
             </div>
@@ -1015,11 +1034,12 @@ function createModelSimilarityNetwork() {
         // Add model nodes and connect to specialties based on performance
         topModels.forEach(model => {
             const modelId = nodeId++;
-            const finalName = replaceUnderscoresWithSpaces(
-                applyCharacterReplacements(
-                    applyExtension(model.name)
-                )
-            );
+            const cleanName = modelMapping[model.column] || model.name;
+            
+            // Apply all transformations including character replacements
+            const extendedModelName = applyExtension(cleanName);
+            const charReplacedModelName = applyCharacterReplacements(extendedModelName);
+            const finalName = replaceUnderscoresWithSpaces(charReplacedModelName);
             const extracted = extractParameterSize(finalName);
             
             // For network: reattach weight to model name
