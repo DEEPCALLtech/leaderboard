@@ -7,6 +7,8 @@ const TOP_PERFORMANCE_THRESHOLD = 20;
 let resultsData = null;
 let fairnessData = null;
 let performanceData = null;
+let ethnicityData = null;
+let genderData = null;
 
 // Initialize the application
 document.addEventListener('DOMContentLoaded', function() {
@@ -25,10 +27,12 @@ function setupEventListeners() {
 async function loadData() {
     try {
         // Load CSV files (you'll need to host these on your GitHub)
-        const [results, fairness, performance] = await Promise.all([
+        const [results, fairness, performance, ethnicity, gender] = await Promise.all([
             loadCSV('data/model_eval_final.csv'),
             loadCSV('data/fairness_ranking.csv'),
-            loadCSV('data/performance_ranking.csv')
+            loadCSV('data/performance_ranking.csv'),
+            loadCSV('data/ethnicity.csv'),
+            loadCSV('data/gender.csv')
         ]);
         
         // Clean model names (remove -cpu)
@@ -53,6 +57,8 @@ async function loadData() {
         resultsData = results;
         fairnessData = fairness;
         performanceData = performance;
+        ethnicityData = ethnicity;
+        genderData = gender;
         
         // Auto-run analysis on load
         runAnalysisWithLayoutFix();
@@ -390,14 +396,172 @@ function analyzeDiscriminationPatterns(data) {
     // Clear previous content
     document.getElementById('discrimination-plots').innerHTML = '';
     
-    // This would implement the discrimination pattern analysis
-    // For now, showing a placeholder
-    document.getElementById('discrimination-plots').innerHTML = `
-        <div class="analysis-placeholder">
-            <p>Discrimination pattern analysis would be displayed here.</p>
-            <p>This would show patterns for models in top ${Math.floor(TOP_PERCENTILE_ACCURACY * 100)}% accuracy AND top ${Math.floor(TOP_PERCENTILE_DISCRIMINATION * 100)}% discrimination.</p>
+    if (!ethnicityData || !genderData) {
+        document.getElementById('discrimination-plots').innerHTML = `
+            <div class="analysis-placeholder">
+                <p>Discrimination pattern data not available.</p>
+                <p>Please ensure ethnicity.csv and gender.csv files are loaded.</p>
+            </div>
+        `;
+        return;
+    }
+    
+    // Create the discrimination patterns visualization
+    createDiscriminationPatternsVisualization();
+}
+
+function createDiscriminationPatternsVisualization() {
+    const container = document.getElementById('discrimination-plots');
+    
+    // Create container for both plots
+    container.innerHTML = `
+        <div class="pattern-analysis">
+            <h3>Analysis of Models in Top ${Math.floor(TOP_PERCENTILE_ACCURACY * 100)}% Accuracy AND Top ${Math.floor(TOP_PERCENTILE_DISCRIMINATION * 100)}% Discrimination</h3>
+            <div class="patterns-grid">
+                <div class="pattern-section">
+                    <h4>Ethnicity Group Marginalization Patterns</h4>
+                    <div id="ethnicity-pattern-plot" style="width: 100%; height: 400px;"></div>
+                    <div class="pattern-description">
+                        <p><strong>Analysis:</strong> ${ethnicityData[0]?.Analysis || 'Top performing but highly biased models'}</p>
+                        <p><strong>Total Models Analyzed:</strong> ${ethnicityData[0]?.Total_Models || 6}</p>
+                    </div>
+                </div>
+                <div class="pattern-section">
+                    <h4>Gender Group Marginalization Patterns</h4>
+                    <div id="gender-pattern-plot" style="width: 100%; height: 400px;"></div>
+                    <div class="pattern-description">
+                        <p><strong>Analysis:</strong> ${genderData[0]?.Analysis || 'Top performing but highly biased models'}</p>
+                        <p><strong>Total Models Analyzed:</strong> ${genderData[0]?.Total_Models || 6}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="pattern-insights">
+                <h4>Key Insights:</h4>
+                <ul>
+                    <li><strong>Ethnicity:</strong> ${getEthnicityInsights()}</li>
+                    <li><strong>Gender:</strong> ${getGenderInsights()}</li>
+                </ul>
+            </div>
         </div>
     `;
+    
+    // Create ethnicity pattern plot
+    createEthnicityPatternPlot();
+    
+    // Create gender pattern plot
+    createGenderPatternPlot();
+}
+
+function createEthnicityPatternPlot() {
+    if (!ethnicityData || ethnicityData.length === 0) return;
+    
+    const trace = {
+        x: ethnicityData.map(row => parseFloat(row.Percentage)),
+        y: ethnicityData.map(row => row.Group),
+        type: 'bar',
+        orientation: 'h',
+        marker: {
+            color: ethnicityData.map(row => row.Color || '#FF6B6B'),
+            opacity: 0.8
+        },
+        text: ethnicityData.map(row => `${row.Percentage}% (${row.Count}/${row.Total_Models})`),
+        textposition: 'outside',
+        hovertemplate: '<b>%{y}</b><br>' +
+                      'Marginalization Rate: %{x}%<br>' +
+                      'Count: %{customdata.count}/%{customdata.total}<br>' +
+                      '%{customdata.description}<br>' +
+                      '<extra></extra>',
+        customdata: ethnicityData.map(row => ({
+            count: row.Count,
+            total: row.Total_Models,
+            description: row.Description
+        }))
+    };
+    
+    const layout = {
+        title: 'Ethnicity Group Marginalization in High-Performance, High-Bias Models',
+        xaxis: {
+            title: 'Percentage of Models Showing Bias (%)',
+            range: [0, Math.max(...ethnicityData.map(row => parseFloat(row.Percentage))) + 10]
+        },
+        yaxis: {
+            title: 'Ethnicity Groups'
+        },
+        margin: { l: 100, r: 50, t: 80, b: 80 },
+        height: 400
+    };
+    
+    Plotly.newPlot('ethnicity-pattern-plot', [trace], layout, {responsive: true});
+}
+
+function createGenderPatternPlot() {
+    if (!genderData || genderData.length === 0) return;
+    
+    const trace = {
+        x: genderData.map(row => parseFloat(row.Percentage)),
+        y: genderData.map(row => row.Group),
+        type: 'bar',
+        orientation: 'h',
+        marker: {
+            color: genderData.map(row => row.Color || '#4ECDC4'),
+            opacity: 0.8
+        },
+        text: genderData.map(row => `${row.Percentage}% (${row.Count}/${row.Total_Models})`),
+        textposition: 'outside',
+        hovertemplate: '<b>%{y}</b><br>' +
+                      'Marginalization Rate: %{x}%<br>' +
+                      'Count: %{customdata.count}/%{customdata.total}<br>' +
+                      '%{customdata.description}<br>' +
+                      '<extra></extra>',
+        customdata: genderData.map(row => ({
+            count: row.Count,
+            total: row.Total_Models,
+            description: row.Description
+        }))
+    };
+    
+    const layout = {
+        title: 'Gender Group Marginalization in High-Performance, High-Bias Models',
+        xaxis: {
+            title: 'Percentage of Models Showing Bias (%)',
+            range: [0, Math.max(...genderData.map(row => parseFloat(row.Percentage))) + 10]
+        },
+        yaxis: {
+            title: 'Gender Groups'
+        },
+        margin: { l: 120, r: 50, t: 80, b: 80 },
+        height: 400
+    };
+    
+    Plotly.newPlot('gender-pattern-plot', [trace], layout, {responsive: true});
+}
+
+function getEthnicityInsights() {
+    if (!ethnicityData || ethnicityData.length === 0) return "No data available";
+    
+    const maxBias = ethnicityData.reduce((max, row) => 
+        parseFloat(row.Percentage) > parseFloat(max.Percentage) ? row : max
+    );
+    
+    const minBias = ethnicityData.reduce((min, row) => 
+        parseFloat(row.Percentage) < parseFloat(min.Percentage) ? row : min
+    );
+    
+    return `${maxBias.Group} shows highest bias rate (${maxBias.Percentage}%), while ${minBias.Group} shows lowest (${minBias.Percentage}%)`;
+}
+
+function getGenderInsights() {
+    if (!genderData || genderData.length === 0) return "No data available";
+    
+    const maxBias = genderData.reduce((max, row) => 
+        parseFloat(row.Percentage) > parseFloat(max.Percentage) ? row : max
+    );
+    
+    const minBias = genderData.reduce((min, row) => 
+        parseFloat(row.Percentage) < parseFloat(min.Percentage) ? row : min
+    );
+    
+    return `${maxBias.Group} shows highest bias rate (${maxBias.Percentage}%), while ${minBias.Group} shows lowest (${minBias.Percentage}%)`;
 }
 
 function generateConclusion(data) {
@@ -417,149 +581,4 @@ function generateConclusion(data) {
             <p><strong>Recommended Model:</strong> <strong>${bestModel['Model Name']}</strong></p>
             <ul>
                 <li><strong>Accuracy:</strong> ${accuracy.toFixed(1)}%</li>
-                <li><strong>Discrimination Score:</strong> ${parseFloat(bestModel['Discrimination Global Score']).toFixed(2)}</li>
-                <li><strong>Ranking:</strong> Among the least biased models (bottom 25% discrimination scores), this model achieves the highest accuracy.</li>
-            </ul>
-        `;
-    }
-    
-    conclusion += `
-            <h4>Analysis Summary:</h4>
-            <ul>
-                <li><strong>Total Models Analyzed:</strong> ${data.length}</li>
-                <li><strong>Top ${Math.floor(TOP_PERCENTILE_ACCURACY * 100)}% Most Accurate Models:</strong> ${Math.floor(data.length * TOP_PERCENTILE_ACCURACY)}</li>
-                <li><strong>Top ${Math.floor(TOP_PERCENTILE_DISCRIMINATION * 100)}% Most Biased Models:</strong> ${Math.floor(data.length * TOP_PERCENTILE_DISCRIMINATION)}</li>
-            </ul>
-            <p>This recommendation balances performance with fairness by selecting the most accurate model from among those with the lowest discrimination scores.</p>
-        </div>
-    `;
-    
-    document.getElementById('conclusion-section').innerHTML = conclusion;
-}
-
-function findBestModel(data) {
-    // Find models in bottom quartile of discrimination
-    const discriminationScores = data.map(row => parseFloat(row['Discrimination Global Score']));
-    const q1Threshold = calculatePercentile(discriminationScores, 25);
-    
-    const lowBiasModels = data.filter(row => 
-        parseFloat(row['Discrimination Global Score']) <= q1Threshold
-    );
-    
-    if (lowBiasModels.length === 0) return null;
-    
-    // Find highest accuracy among low bias models
-    return lowBiasModels.reduce((best, current) => {
-        const bestAccuracy = parseFloat(best['Accuracy Global'].replace('%', ''));
-        const currentAccuracy = parseFloat(current['Accuracy Global'].replace('%', ''));
-        return currentAccuracy > bestAccuracy ? current : best;
-    });
-}
-
-function displayResultsTable(data) {
-    // Clear previous content
-    document.getElementById('rankings-table').innerHTML = '';
-    
-    const columns = [
-        { key: 'Rank', header: 'Rank' },
-        { key: 'Model Name', header: 'Model Name' },
-        { key: 'Accuracy Global', header: 'Accuracy Global' },
-        { key: 'Discrimination Global Score', header: 'Discrimination Global Score' }
-    ];
-    
-    // Add any discrimination columns that exist, but exclude any with "Legal" or "legal"
-    const discriminationCols = Object.keys(data[0]).filter(key => 
-        key.includes('Discrimination') && 
-        key.includes('Score') && 
-        !key.includes('Global') &&
-        !key.toLowerCase().includes('legal')
-    );
-    
-    discriminationCols.forEach(col => {
-        columns.push({ key: col, header: col });
-    });
-    
-    displayTable('rankings-table', data, columns);
-}
-
-function displayTable(containerId, data, columns) {
-    let html = '<table class="results-table"><thead><tr>';
-    
-    columns.forEach(col => {
-        html += `<th>${col.header}</th>`;
-    });
-    html += '</tr></thead><tbody>';
-    
-    data.forEach(row => {
-        html += '<tr>';
-        columns.forEach(col => {
-            const value = row[col.key] || '';
-            html += `<td>${value}</td>`;
-        });
-        html += '</tr>';
-    });
-    
-    html += '</tbody></table>';
-    document.getElementById(containerId).innerHTML = html;
-}
-
-// Utility functions
-function findColumn(data, ...keywords) {
-    const columns = Object.keys(data[0] || {});
-    return columns.find(col => 
-        keywords.every(keyword => col.includes(keyword))
-    );
-}
-
-function calculatePercentile(values, percentile) {
-    const sorted = [...values].sort((a, b) => a - b);
-    const index = (percentile / 100) * (sorted.length - 1);
-    const lower = Math.floor(index);
-    const upper = Math.ceil(index);
-    const weight = index % 1;
-    
-    if (upper >= sorted.length) return sorted[sorted.length - 1];
-    return sorted[lower] * (1 - weight) + sorted[upper] * weight;
-}
-
-function showError(message) {
-    const errorHtml = `<div class="error-message">${message}</div>`;
-    document.getElementById('rankings-table').innerHTML = errorHtml;
-    document.getElementById('fairness-plot').innerHTML = errorHtml;
-    document.getElementById('fairness-table').innerHTML = errorHtml;
-    document.getElementById('gender-plot').innerHTML = errorHtml;
-    document.getElementById('ethnicity-plot').innerHTML = errorHtml;
-    document.getElementById('discrimination-plots').innerHTML = errorHtml;
-    document.getElementById('conclusion-section').innerHTML = errorHtml;
-}
-
-// Add this function to fix layout issues
-function fixLayoutIssues() {
-    // Force Plotly to resize
-    const plotIds = ['fairness-plot', 'gender-plot', 'ethnicity-plot'];
-    plotIds.forEach(id => {
-        const element = document.getElementById(id);
-        if (element && element.firstChild) {
-            Plotly.Plots.resize(element);
-        }
-    });
-    
-    // Ensure proper spacing
-    const sections = document.querySelectorAll('.glass-panel');
-    sections.forEach((section, index) => {
-        section.style.marginBottom = '3rem';
-        section.style.position = 'relative';
-        section.style.zIndex = index + 1;
-    });
-}
-
-// Call this function after creating plots
-function runAnalysisWithLayoutFix() {
-    runAnalysis();
-    setTimeout(fixLayoutIssues, 500); // Give plots time to render
-}
-
-// Also call on window resize
-window.addEventListener('resize', () => {
-    setTimeout(fixLayoutIssues, 200);
-});
+                <li><strong>Discrimination Score:</strong> ${parseFloat(bestModel['Discrimination Global Score']).toFixed(
